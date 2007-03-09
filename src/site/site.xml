@@ -1,0 +1,10 @@
+<project name="Maven proguard Plug-In">
+  <body>
+    <menu name="Maven proguard Quickstart">
+      <item name="Plugin Goals" href="index.html"/>
+      <item name="Introduction" href="introduction.html"/>
+    </menu>
+    <menu ref="parent" />
+    ${reports}
+  </body>
+</project>
