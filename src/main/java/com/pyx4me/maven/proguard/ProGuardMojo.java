@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -55,7 +56,7 @@ public class ProGuardMojo extends AbstractMojo {
 	 * 
 	 * @parameter default-value="true"
 	 */	
-	private boolean includeDependancy;
+	private boolean includeDependency;
 	
 	
 	/**
@@ -248,7 +249,15 @@ public class ProGuardMojo extends AbstractMojo {
 			List dependancy = mavenProject.getCompileArtifacts();
 			for (Iterator i = dependancy.iterator(); i.hasNext();) {
 				Artifact artifact = (Artifact) i.next();
-				log.debug("--- compile artifact:" + artifact.getArtifactId() + " " + artifact.getClassifier() + " " + artifact.getScope());
+				log.debug("--- compile artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()  + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
+			}
+			for (Iterator i = mavenProject.getArtifacts().iterator(); i.hasNext();) {
+				Artifact artifact = (Artifact) i.next();
+				log.debug("--- artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()  + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
+			}
+			for (Iterator i = mavenProject.getDependencies().iterator(); i.hasNext();) {
+				Dependency artifact = (Dependency) i.next();
+				log.debug("--- dependency " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()  + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
 			}
 		}
 		
@@ -258,19 +267,25 @@ public class ProGuardMojo extends AbstractMojo {
 			for (Iterator iter = assembly.inclusions.iterator(); iter.hasNext();) {
 				Inclusion inc = (Inclusion) iter.next();
 				if (!inc.library) {
-					args.add("-injars");
 					File file = getClasspathElement(getDependancy(inc, mavenProject), mavenProject);
 					inPath.add(file.toString());
-					log.debug("--- ADD JAR:" + inc.artifactId);
+					log.debug("--- ADD injars:" + inc.artifactId);
 					StringBuffer filter = new StringBuffer(fileToString(file));
 					filter.append("(!META-INF/MANIFEST.MF");
 					if (inc.filter != null) {
 						filter.append(",").append(inc.filter);
 					} 
 					filter.append(")");
+					args.add("-injars");
 					args.add(filter.toString());
 				} else {
 					hasInclusionLibrary = true;
+					log.debug("--- ADD libraryjars:" + inc.artifactId);
+					// This may not be CompileArtifacts, maven 2.0.6 bug
+					File file = getClasspathElement(getDependancy(inc, mavenProject), mavenProject);
+					inPath.add(file.toString());
+					args.add("-libraryjars");
+					args.add(fileToString(file));
 				}
 			}
 		}
@@ -296,27 +311,21 @@ public class ProGuardMojo extends AbstractMojo {
 			}
 		}
 
-		if (includeDependancy) {
-			List dependancy = this.mavenProject.getCompileArtifacts();
-			for (Iterator i = dependancy.iterator(); i.hasNext();) {
+		if (includeDependency) {
+			List dependency = this.mavenProject.getCompileArtifacts();
+			for (Iterator i = dependency.iterator(); i.hasNext();) {
 				Artifact artifact = (Artifact) i.next();
-				// dependancy filter
+				// dependency filter
 				if (isExclusion(artifact)) {
 					continue;
 				}
-				File file;
-				if (artifact.getClassifier() == null) {
-				    // Conver to path if artifact is module
-					file = getClasspathElement(artifact, mavenProject);
-				} else {
-					file = artifact.getFile();
-				}
+				File file = getClasspathElement(artifact, mavenProject);
 				
 				if (inPath.contains(file.toString())) {
-					log.debug("--- Ignore JAR:" + artifact.getArtifactId());
+					log.debug("--- ignore libraryjars since one in injar:" + artifact.getArtifactId());
 					continue;
 				}
-				log.debug("--- LIBRARY JAR:" + artifact.getArtifactId());
+				log.debug("--- ADD libraryjars:" + artifact.getArtifactId());
 				args.add("-libraryjars");
 				args.add(fileToString(file));
 			}
@@ -372,11 +381,7 @@ public class ProGuardMojo extends AbstractMojo {
 					if (inc.library) {
 						File file; 
 						Artifact artifact = getDependancy(inc, mavenProject);
-						if (artifact.getClassifier() == null) {
-							file = getClasspathElement(artifact, mavenProject);
-						} else {
-							file = artifact.getFile();
-						}
+						file = getClasspathElement(artifact, mavenProject);
 						if (file.isDirectory()) {
 							getLog().info("merge project: " + artifact.getArtifactId() + " " + file);
 							jarArchiver.addDirectory(file);
@@ -498,7 +503,7 @@ public class ProGuardMojo extends AbstractMojo {
 	}
 	
 	private static Artifact getDependancy(Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
-		List dependancy = mavenProject.getCompileArtifacts();
+		Set dependancy = mavenProject.getArtifacts();
 		for (Iterator i = dependancy.iterator(); i.hasNext();) {
 			Artifact artifact = (Artifact) i.next();
 			if (inc.match(artifact)) {
@@ -522,6 +527,9 @@ public class ProGuardMojo extends AbstractMojo {
 	}
 	
 	private static File getClasspathElement(Artifact artifact, MavenProject mavenProject) throws MojoExecutionException {
+		if (artifact.getClassifier() != null) {
+			return artifact.getFile();
+		}
 		String refId = artifact.getGroupId() + ":" + artifact.getArtifactId();
         MavenProject project = (MavenProject) mavenProject.getProjectReferences().get( refId );
         if (project != null) {
