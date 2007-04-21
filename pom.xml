@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.pyx4me</groupId>
         <artifactId>pyx4me-maven-plugins</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>2.0.1-SNAPSHOT</version><!--pyx4me-version-->
         <relativePath>../pom.xml</relativePath>
     </parent>
 
