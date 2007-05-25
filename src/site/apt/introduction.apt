@@ -12,6 +12,56 @@ proguard-maven-plugin
 
   The proguard-maven-plugin is maven2 plugin to execute {{{http://proguard.sourceforge.net/}ProGuard}}
 
+* Parameters
+
+    Regular {{{proguard-mojo.html}proguard:proguard parameters}}
+
+    <<<libs>>> JVM libraries usualy not in dependency list
+
+---
+    <libs>
+        <lib>${java.home}/lib/rt.jar</lib>
+        <lib>${java.home}/lib/jsse.jar</lib>
+    </libs>
+---
+
+    <<<exclusions>>> allow fine grain filer for dependency if includeDependency is enabled
+
+---
+    <exclusions>
+        <exclusion>
+            <groupId>org.grp</groupId><artifactId>art1</artifactId>
+        </exclusion>
+        <exclusion>
+            <!-- org.grp:art2 without classifier will still be included -->
+            <groupId>org.grp</groupId><artifactId>art2</artifactId><classifier>app<classifier>
+        </exclusion>
+    </exclusions>
+---
+
+    <<<assembly>>> allows to bundle project dependency to resulting jar with different options e.g. -injars ProGuard args.
+    Some flagged as <<<library>>> don't need to be processed by ProGuard are added as -libraryjars and added to resulting jar by plugin after ProGuard is finished.
+    For clarity param <<<includeDependency>>> will just add -libraryjars arg to ProGuard and Dependency is not included in resulting jar.
+
+---
+    <assembly>
+        <inclusions>
+            <inclusion>
+                <!-- add jar already prepossessed with different options -->
+                <groupId>org.microemu</groupId><artifactId>microemu-cldc</artifactId><classifier>4applet</classifier><library>true</library>
+                <!-- filter will not apply -->
+            </inclusion>
+            <inclusion>
+                <!-- filter out some classes see ProGuard classpathentry Filters -->
+                <groupId>org.microemu</groupId><artifactId>microemu-javase</artifactId>
+                <filter>!org/microemu/app/classloader/**</filter>
+            </inclusion>
+            <inclusion>
+                <groupId>org.microemu</groupId><artifactId>microemu-javase-swing</artifactId>
+            </inclusion>
+        </inclusions>
+    </assembly>
+---
 
 * Usage
 

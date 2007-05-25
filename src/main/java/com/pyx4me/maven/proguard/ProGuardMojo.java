@@ -59,7 +59,7 @@ public class ProGuardMojo extends AbstractMojo {
 	private boolean obfuscate;
 
 	/**
-	 * Specifies that project compile dependencies be added as -libraryjars to proguard arguments
+	 * Specifies that project compile dependencies be added as -libraryjars to proguard arguments. Dependency itself is not included in resulting jar
 	 *
 	 * @parameter default-value="true"
 	 */
@@ -97,8 +97,8 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * Specifies the names of the output jars.
-	 * If attach the value ignored and anme constructed base on classifier
-	 * If empty  input jar would be overdriven.
+	 * If attach=true the value ignored and name constructed base on classifier
+	 * If empty input jar would be overdriven.
 	 *
 	 * @parameter
 	 */
@@ -119,7 +119,7 @@ public class ProGuardMojo extends AbstractMojo {
 	private String attachArtifactType;
 
 	/**
-	 * Specifies attach artifact Classifier
+	 * Specifies attach artifact Classifier, Ignored if attach=false
 	 *
 	 * @parameter default-value="small"
 	 */
@@ -173,7 +173,7 @@ public class ProGuardMojo extends AbstractMojo {
 	private JarArchiver jarArchiver;
 
 	/**
-	 * The maven archive configuration to use.
+	 * The maven archive configuration to use. only if assembly is used.
 	 *
 	 * @parameter
 	 */
