@@ -1,7 +1,7 @@
 /**
  * Pyx4me framework
  * Copyright (C) 2006-2007 pyx4.com.
- * 
+ *
  * @author vlads
  * @version $Id$
  */
@@ -31,11 +31,11 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 /**
- * 
+ *
  * <p>
  *  The Obfuscate task provides a standalone obfuscation task
  * </p>
- * 
+ *
  * @goal proguard
  * @phase package
  * @description Create small jar files using ProGuard
@@ -45,95 +45,93 @@ import org.codehaus.plexus.archiver.jar.JarArchiver;
 public class ProGuardMojo extends AbstractMojo {
 
 	/**
-	 * Recursively reads configuration options from the given file filename 
-	 * 
+	 * Recursively reads configuration options from the given file filename
+	 *
 	 * @parameter default-value="${basedir}/proguard.conf"
 	 */
 	private File proguardInclude;
 
 	/**
-	 * Specifies not to obfuscate the input class files. 
-	 * 
+	 * Specifies not to obfuscate the input class files.
+	 *
 	 * @parameter default-value="true"
 	 */
-	private boolean obfuscate; 
+	private boolean obfuscate;
 
 	/**
-	 * Specifies that project compile dependencies be added as -libraryjars to proguard arguments 
-	 * 
+	 * Specifies that project compile dependencies be added as -libraryjars to proguard arguments
+	 *
 	 * @parameter default-value="true"
-	 */	
+	 */
 	private boolean includeDependency;
-	
-	
+
 	/**
 	 * Bundle project dependency to resulting jar. Specifies list of artifact inclusions
-	 * 
+	 *
 	 * @parameter
 	 */
 	private Assembly assembly;
 
-	
 	/**
-	 * Additional -libraryjars e.g. ${java.home}/lib/rt.jar 
+	 * Additional -libraryjars e.g. ${java.home}/lib/rt.jar
 	 * Project compile dependency are added automaticaly. See exclusions
-	 * 
+	 *
 	 * @parameter
 	 */
 	private List libs;
-	
+
 	/**
 	 * List of dependency exclusions
-	 * 
+	 *
 	 * @parameter
 	 */
 	private List exclusions;
-	
+
 	/**
-	 * Specifies the input jar name (or wars, ears, zips) of the application to be processed. 
-	 * 
+	 * Specifies the input jar name (or wars, ears, zips) of the application to be processed.
+	 *
 	 * @parameter expression="${project.build.finalName}.jar"
 	 * @required
 	 */
 	protected String injar;
 
 	/**
-	 * Specifies the names of the output jars. 
+	 * Specifies the names of the output jars.
 	 * If attach the value ignored and anme constructed base on classifier
 	 * If empty  input jar would be overdriven.
-	 * 
+	 *
 	 * @parameter
 	 */
 	protected String outjar;
 
-    /**
-     * Specifies whether or not to attach the created artifact to the project
-     *
-     * @parameter default-value="false"
-     */
-    private boolean attach = false;
+	/**
+	 * Specifies whether or not to attach the created artifact to the project
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean attach = false;
 
-    /**
-     * Specifies attach artifact type
-     *
-     * @parameter default-value="jar"
-     */
-    private String attachArtifactType;
+	/**
+	 * Specifies attach artifact type
+	 *
+	 * @parameter default-value="jar"
+	 */
+	private String attachArtifactType;
 
-    /**
-     * Specifies attach artifact Classifier
-     *
-     * @parameter default-value="small"
-     */
-    private String attachArtifactClassifier;
-    
-    /**
-     * Set to false to exclude the attachArtifactClassifier from the Artifact final name. Default value is true.
-     *
-     * @parameter default-value="true"
-     */
-    private boolean appendClassifier;
-    
+	/**
+	 * Specifies attach artifact Classifier
+	 *
+	 * @parameter default-value="small"
+	 */
+	private String attachArtifactClassifier;
+
+	/**
+	 * Set to false to exclude the attachArtifactClassifier from the Artifact final name. Default value is true.
+	 *
+	 * @parameter default-value="true"
+	 */
+	private boolean appendClassifier;
+
 	/**
 	 * Directory containing the input and generated JAR.
 	 *
@@ -161,67 +159,74 @@ public class ProGuardMojo extends AbstractMojo {
 	 */
 	protected List pluginArtifacts;
 
-    /**
-     * @component
-     */
-    private MavenProjectHelper projectHelper;
-	
-    /**
-     * The Jar archiver.
-     *
-     * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
-     * @required
-     */
-    private JarArchiver jarArchiver;
-    
-    /**
-     * The maven archive configuration to use.
-     *
-     * @parameter
-     */
-    protected MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
-    
+	/**
+	 * @component
+	 */
+	private MavenProjectHelper projectHelper;
+
+	/**
+	 * The Jar archiver.
+	 *
+	 * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
+	 * @required
+	 */
+	private JarArchiver jarArchiver;
+
+	/**
+	 * The maven archive configuration to use.
+	 *
+	 * @parameter
+	 */
+	protected MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
+
+	/**
+	 * The max memory the forked java process should use, e.g. 256m
+	 *
+	 * @parameter
+	 */
+	protected String maxMemory;
+
 	private Log log;
 
 	static final String proguardMainClass = "proguard.ProGuard";
 
 	/**
 	 * ProGuard docs:
-	 * Names with special characters like spaces and parentheses must be quoted with single or double quotes. 
+	 * Names with special characters like spaces and parentheses must be quoted with single or double quotes.
 	 */
 	private static String fileNameToString(String fileName) {
 		return "'" + fileName + "'";
 	}
-	
+
 	private static String fileToString(File file) {
 		return fileNameToString(file.toString());
 	}
-	
+
 	private boolean useArtifactClassifier() {
 		return appendClassifier && ((attachArtifactClassifier != null) && (attachArtifactClassifier.length() > 0));
 	}
-	
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
 		log = getLog();
 
 		boolean mainIsJar = mavenProject.getPackaging().equals("jar");
 		boolean mainIsPom = mavenProject.getPackaging().equals("pom");
-		
+
 		File inJarFile = new File(outputDirectory, injar);
 		if (mainIsJar && (!inJarFile.exists())) {
 			throw new MojoFailureException("Can't find file " + inJarFile);
 		}
-		
+
 		if (!outputDirectory.exists()) {
 			if (!outputDirectory.mkdirs()) {
 				throw new MojoFailureException("Can't create " + outputDirectory);
 			}
 		}
-		
+
 		File outJarFile;
 		boolean sameArtifact;
-		
+
 		if (attach) {
 			outjar = nameNoType(injar);
 			if (useArtifactClassifier()) {
@@ -229,7 +234,7 @@ public class ProGuardMojo extends AbstractMojo {
 			}
 			outjar += "." + attachArtifactType;
 		}
-		
+
 		if ((outjar != null) && (!outjar.equals(injar))) {
 			sameArtifact = false;
 			outJarFile = (new File(outputDirectory, outjar)).getAbsoluteFile();
@@ -251,23 +256,26 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 
 		ArrayList args = new ArrayList();
-		
+
 		if (log.isDebugEnabled()) {
 			List dependancy = mavenProject.getCompileArtifacts();
 			for (Iterator i = dependancy.iterator(); i.hasNext();) {
 				Artifact artifact = (Artifact) i.next();
-				log.debug("--- compile artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()  + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
+				log.debug("--- compile artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
+						+ artifact.getType() + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
 			}
 			for (Iterator i = mavenProject.getArtifacts().iterator(); i.hasNext();) {
 				Artifact artifact = (Artifact) i.next();
-				log.debug("--- artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()  + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
+				log.debug("--- artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
+						+ artifact.getType() + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
 			}
 			for (Iterator i = mavenProject.getDependencies().iterator(); i.hasNext();) {
 				Dependency artifact = (Dependency) i.next();
-				log.debug("--- dependency " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()  + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
+				log.debug("--- dependency " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
+						+ artifact.getType() + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
 			}
 		}
-		
+
 		Set inPath = new HashSet();
 		boolean hasInclusionLibrary = false;
 		if (assembly != null) {
@@ -281,7 +289,7 @@ public class ProGuardMojo extends AbstractMojo {
 					filter.append("(!META-INF/MANIFEST.MF");
 					if (inc.filter != null) {
 						filter.append(",").append(inc.filter);
-					} 
+					}
 					filter.append(")");
 					args.add("-injars");
 					args.add(filter.toString());
@@ -307,7 +315,7 @@ public class ProGuardMojo extends AbstractMojo {
 		if (!obfuscate) {
 			args.add("-dontobfuscate");
 		}
-		
+
 		if (proguardInclude != null) {
 			if (proguardInclude.exists()) {
 				args.add("-include");
@@ -327,7 +335,7 @@ public class ProGuardMojo extends AbstractMojo {
 					continue;
 				}
 				File file = getClasspathElement(artifact, mavenProject);
-				
+
 				if (inPath.contains(file.toString())) {
 					log.debug("--- ignore libraryjars since one in injar:" + artifact.getArtifactId());
 					continue;
@@ -337,7 +345,7 @@ public class ProGuardMojo extends AbstractMojo {
 				args.add(fileToString(file));
 			}
 		}
-		
+
 		if (libs != null) {
 			for (Iterator i = libs.iterator(); i.hasNext();) {
 				Object lib = i.next();
@@ -349,22 +357,20 @@ public class ProGuardMojo extends AbstractMojo {
 		args.add("-printmapping");
 		args.add(fileToString((new File(outputDirectory, "proguard_map.txt").getAbsoluteFile())));
 
-
 		args.add("-printseeds");
 		args.add(fileToString((new File(outputDirectory, "proguard_seeds.txt").getAbsoluteFile())));
 
-		
 		if (log.isDebugEnabled()) {
 			args.add("-verbose");
 		}
 
 		log.info("execute ProGuard " + args.toString());
 		proguardMain(getProguardJar(this), args, this);
-		
+
 		if ((assembly != null) && (hasInclusionLibrary)) {
-		
+
 			log.info("creating assembly");
-			
+
 			File baseFile = new File(outputDirectory, nameNoType(injar) + "_proguard_result.jar");
 			if (baseFile.exists()) {
 				if (!baseFile.delete()) {
@@ -375,18 +381,18 @@ public class ProGuardMojo extends AbstractMojo {
 			if (!outJarFile.renameTo(baseFile)) {
 				throw new MojoFailureException("Can't rename " + outJarFile);
 			}
-			
+
 			MavenArchiver archiver = new MavenArchiver();
 			archiver.setArchiver(jarArchiver);
 			archiver.setOutputFile(archiverFile);
-			
+
 			try {
 				jarArchiver.addArchivedFileSet(baseFile);
-				
+
 				for (Iterator iter = assembly.inclusions.iterator(); iter.hasNext();) {
 					Inclusion inc = (Inclusion) iter.next();
 					if (inc.library) {
-						File file; 
+						File file;
 						Artifact artifact = getDependancy(inc, mavenProject);
 						file = getClasspathElement(artifact, mavenProject);
 						if (file.isDirectory()) {
@@ -398,15 +404,15 @@ public class ProGuardMojo extends AbstractMojo {
 						}
 					}
 				}
-				
+
 				archiver.createArchive(mavenProject, archive);
-				
+
 			} catch (Exception e) {
 				throw new MojoExecutionException("Unable to create jar", e);
 			}
-			
+
 		}
-		
+
 		if (attach && !sameArtifact) {
 			if (useArtifactClassifier()) {
 				projectHelper.attachArtifact(mavenProject, attachArtifactType, attachArtifactClassifier, outJarFile);
@@ -423,7 +429,7 @@ public class ProGuardMojo extends AbstractMojo {
 		if ((artifact1 == null) || (artifact1.getVersion() == null)) {
 			return false;
 		}
-		// Just very simple 
+		// Just very simple
 		return (artifact1.getVersion().compareTo(artifact2.getVersion()) > 0);
 	}
 
@@ -473,15 +479,15 @@ public class ProGuardMojo extends AbstractMojo {
 		Project antProject = new Project();
 		antProject.setName(mojo.mavenProject.getName());
 		antProject.init();
-		
-		DefaultLogger antLogger = new DefaultLogger();
-        antLogger.setOutputPrintStream( System.out );
-        antLogger.setErrorPrintStream( System.err );
-        antLogger.setMessageOutputLevel(mojo.log.isDebugEnabled() ? Project.MSG_DEBUG : Project.MSG_INFO );
 
-        antProject.addBuildListener( antLogger );
-        antProject.setBaseDir( mojo.mavenProject.getBasedir() );
-		
+		DefaultLogger antLogger = new DefaultLogger();
+		antLogger.setOutputPrintStream(System.out);
+		antLogger.setErrorPrintStream(System.err);
+		antLogger.setMessageOutputLevel(mojo.log.isDebugEnabled() ? Project.MSG_DEBUG : Project.MSG_INFO);
+
+		antProject.addBuildListener(antLogger);
+		antProject.setBaseDir(mojo.mavenProject.getBasedir());
+
 		java.setProject(antProject);
 		java.setTaskName("proguard");
 
@@ -494,6 +500,11 @@ public class ProGuardMojo extends AbstractMojo {
 		java.setFailonerror(true);
 
 		java.setFork(true);
+
+		// get the maxMemory setting
+		if (mojo.maxMemory != null) {
+			java.setMaxmemory(mojo.maxMemory);
+		}
 
 		for (Iterator i = argsList.iterator(); i.hasNext();) {
 			java.createArg().setValue(i.next().toString());
@@ -508,7 +519,7 @@ public class ProGuardMojo extends AbstractMojo {
 	private static String nameNoType(String artifactname) {
 		return artifactname.substring(0, artifactname.lastIndexOf('.'));
 	}
-	
+
 	private static Artifact getDependancy(Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
 		Set dependancy = mavenProject.getArtifacts();
 		for (Iterator i = dependancy.iterator(); i.hasNext();) {
@@ -519,10 +530,10 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 		throw new MojoExecutionException("artifactId Not found " + inc.artifactId);
 	}
-	
+
 	private boolean isExclusion(Artifact artifact) {
 		if (exclusions == null) {
-			return false;	
+			return false;
 		}
 		for (Iterator iter = exclusions.iterator(); iter.hasNext();) {
 			Exclusion excl = (Exclusion) iter.next();
@@ -532,14 +543,14 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 		return false;
 	}
-	
+
 	private static File getClasspathElement(Artifact artifact, MavenProject mavenProject) throws MojoExecutionException {
 		if (artifact.getClassifier() != null) {
 			return artifact.getFile();
 		}
 		String refId = artifact.getGroupId() + ":" + artifact.getArtifactId();
-        MavenProject project = (MavenProject) mavenProject.getProjectReferences().get( refId );
-        if (project != null) {
+		MavenProject project = (MavenProject) mavenProject.getProjectReferences().get(refId);
+		if (project != null) {
 			return new File(project.getBuild().getOutputDirectory());
 		} else {
 			File file = artifact.getFile();
