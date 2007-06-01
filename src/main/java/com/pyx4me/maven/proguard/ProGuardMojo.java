@@ -96,6 +96,13 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String injar;
 
 	/**
+	 * Apply ProGuard classpathentry Filters to dependency input jar. e.g. <code>!**.gif,!**&#47;tests&#47;**'</code>  
+	 *
+	 * @parameter
+	 */
+	protected String inFilter;
+	
+	/**
 	 * Specifies the names of the output jars.
 	 * If attach=true the value ignored and name constructed base on classifier
 	 * If empty input jar would be overdriven.
@@ -307,7 +314,11 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if ((!mainIsPom) && inJarFile.exists()) {
 			args.add("-injars");
-			args.add(fileToString(inJarFile));
+			StringBuffer filter = new StringBuffer(fileToString(inJarFile));
+			if (inFilter != null) {
+				filter.append("(").append(inFilter).append(")");
+			}
+			args.add(filter.toString());
 		}
 		args.add("-outjars");
 		args.add(fileToString(outJarFile));

@@ -16,7 +16,7 @@ proguard-maven-plugin
 
     Regular {{{proguard-mojo.html}proguard:proguard parameters}}
 
-    <<<libs>>> JVM libraries usually not in dependency list
+    ** <<<libs>>> JVM libraries usually not in dependency list
 
 ---
     <libs>
@@ -25,7 +25,13 @@ proguard-maven-plugin
     </libs>
 ---
 
-    <<<exclusions>>> allow fine grain filter for dependency if includeDependency is enabled
+    ** You can use <<<inFilter>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to input jar
+
+---
+    <inFilter>!org/microemu/app/classloader/**</inFilter>
+---
+
+    ** <<<exclusions>>> allow fine grain filter for dependency if includeDependency is enabled
 
 ---
     <exclusions>
@@ -39,7 +45,7 @@ proguard-maven-plugin
     </exclusions>
 ---
 
-    <<<assembly>>> allows to bundle project dependency to resulting jar with different options e.g. -injars ProGuard args.
+    ** <<<assembly>>> allows to bundle project dependency to resulting jar with different options e.g. -injars ProGuard args.
     Some flagged as <<<library>>> doesn’t need to be processed by ProGuard are added as -libraryjars and added to resulting jar by plugin after ProGuard is finished.
     For clarity param <<<includeDependency>>> will just add -libraryjars arg to ProGuard and Dependency is not included in resulting jar.
 
