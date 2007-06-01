@@ -96,7 +96,7 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String injar;
 
 	/**
-	 * Apply ProGuard classpathentry Filters to dependency input jar. e.g. <code>!**.gif,!**&#47;tests&#47;**'</code>  
+	 * Apply ProGuard classpathentry Filters to input jar. e.g. <code>!**.gif,!**&#47;tests&#47;**'</code>  
 	 *
 	 * @parameter
 	 */
