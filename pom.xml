@@ -31,7 +31,7 @@
         <dependency>
             <groupId>net.sf.proguard</groupId>
             <artifactId>proguard</artifactId>
-            <version>3.8</version>
+            <version>3.9</version>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
