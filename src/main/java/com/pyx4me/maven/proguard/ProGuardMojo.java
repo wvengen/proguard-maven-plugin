@@ -140,6 +140,13 @@ public class ProGuardMojo extends AbstractMojo {
 	private boolean appendClassifier;
 
 	/**
+	 * Set to true to include META-INF/maven/** maven descriptord 
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean addMavenDescriptor;
+	
+	/**
 	 * Directory containing the input and generated JAR.
 	 *
 	 * @parameter expression="${project.build.directory}"
@@ -294,6 +301,10 @@ public class ProGuardMojo extends AbstractMojo {
 					log.debug("--- ADD injars:" + inc.artifactId);
 					StringBuffer filter = new StringBuffer(fileToString(file));
 					filter.append("(!META-INF/MANIFEST.MF");
+					if (!addMavenDescriptor) {
+						filter.append(",");
+						filter.append("!META-INF/maven/**");
+					}
 					if (inc.filter != null) {
 						filter.append(",").append(inc.filter);
 					}
@@ -315,8 +326,23 @@ public class ProGuardMojo extends AbstractMojo {
 		if ((!mainIsPom) && inJarFile.exists()) {
 			args.add("-injars");
 			StringBuffer filter = new StringBuffer(fileToString(inJarFile));
-			if (inFilter != null) {
-				filter.append("(").append(inFilter).append(")");
+			if ((inFilter != null) || (!addMavenDescriptor)) {
+				filter.append("(");
+				boolean coma = false;
+				
+				if (!addMavenDescriptor) {
+					coma = true;
+					filter.append("!META-INF/maven/**");
+				}
+				
+				if (inFilter != null) {
+					if (coma) {
+						filter.append(",");
+					}
+					filter.append(inFilter);
+				}
+				
+				filter.append(")");
 			}
 			args.add(filter.toString());
 		}
@@ -396,7 +422,8 @@ public class ProGuardMojo extends AbstractMojo {
 			MavenArchiver archiver = new MavenArchiver();
 			archiver.setArchiver(jarArchiver);
 			archiver.setOutputFile(archiverFile);
-
+			archive.setAddMavenDescriptor(addMavenDescriptor);
+			
 			try {
 				jarArchiver.addArchivedFileSet(baseFile);
 
