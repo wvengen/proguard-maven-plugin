@@ -71,6 +71,24 @@ proguard-maven-plugin
     </assembly>
 ---
 
+    ** ProGuard <<<options>>>
+
+        Some ProGuard options are created automatically
+
+        * <<<-dontobfuscate>>> When obfuscate is false
+
+        * <<<-libraryjars>>> Are created base on <<<libs>>> and your project dependencies when includeDependency is true (by default).
+
+        * <<<-verbose>>>  When executing <<<maven -X>>>
+
+        * <<<-printmapping>>> ${project.build.directory}/proguard_map.txt and <<<-printseeds>>> ${project.build.directory}/proguard_seeds.txt
+
+        []
+
+    Additional ProGuard configuration can be added using {{{proguard-mojo.html#options}options}} or {{{proguard-mojo.html#proguardInclude}proguardInclude}}
+
+
+
 * Usage
 
     Replace project artifact with obfuscated one. Original jar would be preserved in file project.build.finalName.jar_proguard_base.jar
@@ -88,6 +106,10 @@ proguard-maven-plugin
                    </execution>
                 </executions>
                 <configuration>
+                    <options>
+                        <option>-allowaccessmodification</option>
+                        <option>-keep public class * extends java.applet.Applet { *; }</option>
+                    </options>
                     <libs>
                         <lib>${java.home}/lib/rt.jar</lib>
                     </libs>

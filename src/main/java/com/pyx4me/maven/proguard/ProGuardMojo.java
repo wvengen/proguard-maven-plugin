@@ -31,11 +31,11 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 /**
- *
+ * 
  * <p>
- *  The Obfuscate task provides a standalone obfuscation task
+ * The Obfuscate task provides a stand-alone obfuscation task
  * </p>
- *
+ * 
  * @goal proguard
  * @phase package
  * @description Create small jar files using ProGuard
@@ -46,109 +46,121 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * Recursively reads configuration options from the given file filename
-	 *
+	 * 
 	 * @parameter default-value="${basedir}/proguard.conf"
 	 */
 	private File proguardInclude;
 
 	/**
+	 * ProGuard configuration options
+	 * 
+	 * @parameter
+	 */
+	private String[] options;
+
+	/**
 	 * Specifies not to obfuscate the input class files.
-	 *
+	 * 
 	 * @parameter default-value="true"
 	 */
 	private boolean obfuscate;
 
 	/**
-	 * Specifies that project compile dependencies be added as -libraryjars to proguard arguments. Dependency itself is not included in resulting jar
-	 *
+	 * Specifies that project compile dependencies be added as -libraryjars to
+	 * proguard arguments. Dependency itself is not included in resulting jar
+	 * 
 	 * @parameter default-value="true"
 	 */
 	private boolean includeDependency;
 
 	/**
-	 * Bundle project dependency to resulting jar. Specifies list of artifact inclusions
-	 *
+	 * Bundle project dependency to resulting jar. Specifies list of artifact
+	 * inclusions
+	 * 
 	 * @parameter
 	 */
 	private Assembly assembly;
 
 	/**
-	 * Additional -libraryjars e.g. ${java.home}/lib/rt.jar
-	 * Project compile dependency are added automaticaly. See exclusions
-	 *
+	 * Additional -libraryjars e.g. ${java.home}/lib/rt.jar Project compile
+	 * dependency are added automaticaly. See exclusions
+	 * 
 	 * @parameter
 	 */
 	private List libs;
 
 	/**
 	 * List of dependency exclusions
-	 *
+	 * 
 	 * @parameter
 	 */
 	private List exclusions;
 
 	/**
-	 * Specifies the input jar name (or wars, ears, zips) of the application to be processed.
-	 *
+	 * Specifies the input jar name (or wars, ears, zips) of the application to
+	 * be processed.
+	 * 
 	 * @parameter expression="${project.build.finalName}.jar"
 	 * @required
 	 */
 	protected String injar;
 
 	/**
-	 * Apply ProGuard classpathentry Filters to input jar. e.g. <code>!**.gif,!**&#47;tests&#47;**'</code>  
-	 *
+	 * Apply ProGuard classpathentry Filters to input jar. e.g.
+	 * <code>!**.gif,!**&#47;tests&#47;**'</code>
+	 * 
 	 * @parameter
 	 */
 	protected String inFilter;
-	
+
 	/**
-	 * Specifies the names of the output jars.
-	 * If attach=true the value ignored and name constructed base on classifier
-	 * If empty input jar would be overdriven.
-	 *
+	 * Specifies the names of the output jars. If attach=true the value ignored
+	 * and name constructed base on classifier If empty input jar would be
+	 * overdriven.
+	 * 
 	 * @parameter
 	 */
 	protected String outjar;
 
 	/**
 	 * Specifies whether or not to attach the created artifact to the project
-	 *
+	 * 
 	 * @parameter default-value="false"
 	 */
 	private boolean attach = false;
 
 	/**
 	 * Specifies attach artifact type
-	 *
+	 * 
 	 * @parameter default-value="jar"
 	 */
 	private String attachArtifactType;
 
 	/**
 	 * Specifies attach artifact Classifier, Ignored if attach=false
-	 *
+	 * 
 	 * @parameter default-value="small"
 	 */
 	private String attachArtifactClassifier;
 
 	/**
-	 * Set to false to exclude the attachArtifactClassifier from the Artifact final name. Default value is true.
-	 *
+	 * Set to false to exclude the attachArtifactClassifier from the Artifact
+	 * final name. Default value is true.
+	 * 
 	 * @parameter default-value="true"
 	 */
 	private boolean appendClassifier;
 
 	/**
-	 * Set to true to include META-INF/maven/** maven descriptord 
-	 *
+	 * Set to true to include META-INF/maven/** maven descriptord
+	 * 
 	 * @parameter default-value="false"
 	 */
 	private boolean addMavenDescriptor;
-	
+
 	/**
 	 * Directory containing the input and generated JAR.
-	 *
+	 * 
 	 * @parameter expression="${project.build.directory}"
 	 * @required
 	 */
@@ -157,7 +169,7 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * The Maven project reference where the plugin is currently being executed.
 	 * The default value is populated from maven.
-	 *
+	 * 
 	 * @parameter expression="${project}"
 	 * @readonly
 	 * @required
@@ -166,7 +178,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * The plugin dependencies.
-	 *
+	 * 
 	 * @parameter expression="${plugin.artifacts}"
 	 * @required
 	 * @readonly
@@ -180,7 +192,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * The Jar archiver.
-	 *
+	 * 
 	 * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
 	 * @required
 	 */
@@ -188,14 +200,14 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * The maven archive configuration to use. only if assembly is used.
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
 	/**
 	 * The max memory the forked java process should use, e.g. 256m
-	 *
+	 * 
 	 * @parameter
 	 */
 	protected String maxMemory;
@@ -205,8 +217,8 @@ public class ProGuardMojo extends AbstractMojo {
 	static final String proguardMainClass = "proguard.ProGuard";
 
 	/**
-	 * ProGuard docs:
-	 * Names with special characters like spaces and parentheses must be quoted with single or double quotes.
+	 * ProGuard docs: Names with special characters like spaces and parentheses
+	 * must be quoted with single or double quotes.
 	 */
 	private static String fileNameToString(String fileName) {
 		return "'" + fileName + "'";
@@ -329,19 +341,19 @@ public class ProGuardMojo extends AbstractMojo {
 			if ((inFilter != null) || (!addMavenDescriptor)) {
 				filter.append("(");
 				boolean coma = false;
-				
+
 				if (!addMavenDescriptor) {
 					coma = true;
 					filter.append("!META-INF/maven/**");
 				}
-				
+
 				if (inFilter != null) {
 					if (coma) {
 						filter.append(",");
 					}
 					filter.append(inFilter);
 				}
-				
+
 				filter.append(")");
 			}
 			args.add(filter.toString());
@@ -401,6 +413,12 @@ public class ProGuardMojo extends AbstractMojo {
 			args.add("-verbose");
 		}
 
+		if (options != null) {
+			for (int i = 0; i < options.length; i++) {
+				args.add(options[i]);
+			}
+		}
+
 		log.info("execute ProGuard " + args.toString());
 		proguardMain(getProguardJar(this), args, this);
 
@@ -423,7 +441,7 @@ public class ProGuardMojo extends AbstractMojo {
 			archiver.setArchiver(jarArchiver);
 			archiver.setOutputFile(archiverFile);
 			archive.setAddMavenDescriptor(addMavenDescriptor);
-			
+
 			try {
 				jarArchiver.addArchivedFileSet(baseFile);
 
@@ -492,7 +510,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 		ClassLoader cl;
 		cl = mojo.getClass().getClassLoader();
-		//cl = Thread.currentThread().getContextClassLoader();
+		// cl = Thread.currentThread().getContextClassLoader();
 		String classResource = "/" + proguardMainClass.replace('.', '/') + ".class";
 		URL url = cl.getResource(classResource);
 		if (url == null) {
@@ -532,7 +550,7 @@ public class ProGuardMojo extends AbstractMojo {
 		mojo.getLog().info("proguard jar: " + proguardJar);
 
 		java.createClasspath().setLocation(proguardJar);
-		//java.createClasspath().setPath(System.getProperty("java.class.path"));
+		// java.createClasspath().setPath(System.getProperty("java.class.path"));
 		java.setClassname(proguardMainClass);
 
 		java.setFailonerror(true);
