@@ -492,15 +492,25 @@ public class ProGuardMojo extends AbstractMojo {
 	private static File getProguardJar(ProGuardMojo mojo) throws MojoExecutionException {
 
 		Artifact proguardArtifact = null;
+		int proguardArtifactDistance = -1;
 		// This should be solved in Maven 2.1
 		for (Iterator i = mojo.pluginArtifacts.iterator(); i.hasNext();) {
 			Artifact artifact = (Artifact) i.next();
-			if ("proguard".equals(artifact.getArtifactId())) {
-				if (isVersionGrate(artifact, proguardArtifact)) {
-					proguardArtifact = artifact;
-				}
-			}
 			mojo.getLog().debug("pluginArtifact: " + artifact.getFile());
+			if ("proguard".equals(artifact.getArtifactId())) {
+				int distance = artifact.getDependencyTrail().size();
+				mojo.getLog().debug("proguard DependencyTrail: " + distance);
+				if (proguardArtifactDistance == -1) {
+					proguardArtifact = artifact;
+				} else if (distance < proguardArtifactDistance) {
+					proguardArtifact = artifact;
+					proguardArtifactDistance = distance;
+				}
+				// if (isVersionGrate(artifact, proguardArtifact)) {
+				// proguardArtifact = artifact;
+				// break;
+				// }
+			}
 		}
 		if (proguardArtifact != null) {
 			mojo.getLog().debug("proguardArtifact: " + proguardArtifact.getFile());
