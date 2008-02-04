@@ -238,6 +238,7 @@ proguard-maven-plugin
                    </execution>
                 </executions>
                 <configuration>
+                    <proguardVersion>4.0betta1</proguardVersion>
                     <libs>
                         <lib>${java.home}/lib/rt.jar</lib>
                     </libs>

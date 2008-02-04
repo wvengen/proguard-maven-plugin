@@ -52,6 +52,13 @@ public class ProGuardMojo extends AbstractMojo {
 	private File proguardInclude;
 
 	/**
+	 * Select specific ProGuard version from plugin dependencies
+	 * 
+	 * @parameter
+	 */
+	private String proguardVersion;
+
+	/**
 	 * ProGuard configuration options
 	 * 
 	 * @parameter
@@ -478,17 +485,6 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 	}
 
-	static boolean isVersionGrate(Artifact artifact1, Artifact artifact2) {
-		if ((artifact2 == null) || (artifact2.getVersion() == null)) {
-			return true;
-		}
-		if ((artifact1 == null) || (artifact1.getVersion() == null)) {
-			return false;
-		}
-		// Just very simple
-		return (artifact1.getVersion().compareTo(artifact2.getVersion()) > 0);
-	}
-
 	private static File getProguardJar(ProGuardMojo mojo) throws MojoExecutionException {
 
 		Artifact proguardArtifact = null;
@@ -500,16 +496,16 @@ public class ProGuardMojo extends AbstractMojo {
 			if ("proguard".equals(artifact.getArtifactId())) {
 				int distance = artifact.getDependencyTrail().size();
 				mojo.getLog().debug("proguard DependencyTrail: " + distance);
-				if (proguardArtifactDistance == -1) {
+				if ((mojo.proguardVersion != null) && (mojo.proguardVersion.equals(artifact.getVersion()))) {
 					proguardArtifact = artifact;
+					break;
+				} else if (proguardArtifactDistance == -1) {
+					proguardArtifact = artifact;
+					proguardArtifactDistance = distance;
 				} else if (distance < proguardArtifactDistance) {
 					proguardArtifact = artifact;
 					proguardArtifactDistance = distance;
 				}
-				// if (isVersionGrate(artifact, proguardArtifact)) {
-				// proguardArtifact = artifact;
-				// break;
-				// }
 			}
 		}
 		if (proguardArtifact != null) {
