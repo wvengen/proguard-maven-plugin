@@ -271,6 +271,11 @@ public class ProGuardMojo extends AbstractMojo {
 		if ((outjar != null) && (!outjar.equals(injar))) {
 			sameArtifact = false;
 			outJarFile = (new File(outputDirectory, outjar)).getAbsoluteFile();
+			if (outJarFile.exists()) {
+				if (!outJarFile.delete()) {
+					throw new MojoFailureException("Can't delete " + outJarFile);
+				}
+			}
 		} else {
 			sameArtifact = true;
 			outJarFile = inJarFile.getAbsoluteFile();
