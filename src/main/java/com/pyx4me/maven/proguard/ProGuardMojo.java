@@ -58,6 +58,13 @@ import org.codehaus.plexus.archiver.jar.JarArchiver;
 public class ProGuardMojo extends AbstractMojo {
 
 	/**
+	 * Set this to 'true' to bypass ProGuard processing entirely.
+	 * 
+	 * @parameter expression="${proguard.skip}"
+	 */
+	private boolean skip;
+
+	/**
 	 * Recursively reads configuration options from the given file filename
 	 * 
 	 * @parameter default-value="${basedir}/proguard.conf"
@@ -86,24 +93,23 @@ public class ProGuardMojo extends AbstractMojo {
 	private boolean obfuscate;
 
 	/**
-	 * Specifies that project compile dependencies be added as -libraryjars to
-	 * proguard arguments. Dependency itself is not included in resulting jar
+	 * Specifies that project compile dependencies be added as -libraryjars to proguard arguments. Dependency itself is
+	 * not included in resulting jar
 	 * 
 	 * @parameter default-value="true"
 	 */
 	private boolean includeDependency;
 
 	/**
-	 * Bundle project dependency to resulting jar. Specifies list of artifact
-	 * inclusions
+	 * Bundle project dependency to resulting jar. Specifies list of artifact inclusions
 	 * 
 	 * @parameter
 	 */
 	private Assembly assembly;
 
 	/**
-	 * Additional -libraryjars e.g. ${java.home}/lib/rt.jar Project compile
-	 * dependency are added automaticaly. See exclusions
+	 * Additional -libraryjars e.g. ${java.home}/lib/rt.jar Project compile dependency are added automatically. See
+	 * exclusions
 	 * 
 	 * @parameter
 	 */
@@ -117,8 +123,7 @@ public class ProGuardMojo extends AbstractMojo {
 	private List exclusions;
 
 	/**
-	 * Specifies the input jar name (or wars, ears, zips) of the application to
-	 * be processed.
+	 * Specifies the input jar name (or wars, ears, zips) of the application to be processed.
 	 * 
 	 * @parameter expression="${project.build.finalName}.jar"
 	 * @required
@@ -126,17 +131,22 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String injar;
 
 	/**
-	 * Apply ProGuard classpathentry Filters to input jar. e.g.
-	 * <code>!**.gif,!**&#47;tests&#47;**'</code>
+	 * Set this to 'true' to bypass ProGuard processing when injar does not exists.
+	 * 
+	 * @parameter default-value="false"
+	 */
+	private boolean injarNotExistsSkip;
+
+	/**
+	 * Apply ProGuard classpathentry Filters to input jar. e.g. <code>!**.gif,!**&#47;tests&#47;**'</code>
 	 * 
 	 * @parameter
 	 */
 	protected String inFilter;
 
 	/**
-	 * Specifies the names of the output jars. If attach=true the value ignored
-	 * and name constructed base on classifier If empty input jar would be
-	 * overdriven.
+	 * Specifies the names of the output jars. If attach=true the value ignored and name constructed base on classifier
+	 * If empty input jar would be overdriven.
 	 * 
 	 * @parameter
 	 */
@@ -164,8 +174,7 @@ public class ProGuardMojo extends AbstractMojo {
 	private String attachArtifactClassifier;
 
 	/**
-	 * Set to false to exclude the attachArtifactClassifier from the Artifact
-	 * final name. Default value is true.
+	 * Set to false to exclude the attachArtifactClassifier from the Artifact final name. Default value is true.
 	 * 
 	 * @parameter default-value="true"
 	 */
@@ -187,8 +196,8 @@ public class ProGuardMojo extends AbstractMojo {
 	protected File outputDirectory;
 
 	/**
-	 * The Maven project reference where the plugin is currently being executed.
-	 * The default value is populated from maven.
+	 * The Maven project reference where the plugin is currently being executed. The default value is populated from
+	 * maven.
 	 * 
 	 * @parameter expression="${project}"
 	 * @readonly
@@ -232,13 +241,18 @@ public class ProGuardMojo extends AbstractMojo {
 	 */
 	protected String maxMemory;
 
+	/**
+	 * ProGuard main class name.
+	 * 
+	 * @parameter default-value="proguard.ProGuard"
+	 */
+	protected String proguardMainClass = "proguard.ProGuard";
+
 	private Log log;
 
-	static final String proguardMainClass = "proguard.ProGuard";
-
 	/**
-	 * ProGuard docs: Names with special characters like spaces and parentheses
-	 * must be quoted with single or double quotes.
+	 * ProGuard docs: Names with special characters like spaces and parentheses must be quoted with single or double
+	 * quotes.
 	 */
 	private static String fileNameToString(String fileName) {
 		return "'" + fileName + "'";
@@ -256,12 +270,26 @@ public class ProGuardMojo extends AbstractMojo {
 
 		log = getLog();
 
+		if (skip) {
+			log.info("Bypass ProGuard processing because \"proguard.skip=true\"");
+			return;
+		}
+
 		boolean mainIsJar = mavenProject.getPackaging().equals("jar");
 		boolean mainIsPom = mavenProject.getPackaging().equals("pom");
 
 		File inJarFile = new File(outputDirectory, injar);
 		if (mainIsJar && (!inJarFile.exists())) {
+			if (injarNotExistsSkip) {
+				log.info("Bypass ProGuard processing because \"injar\" dos not exist");
+				return;
+			}
 			throw new MojoFailureException("Can't find file " + inJarFile);
+		}
+
+		if (mainIsPom && (!inJarFile.exists()) && injarNotExistsSkip) {
+			log.info("Bypass ProGuard processing because \"injar\" dos not exist");
+			return;
 		}
 
 		if (!outputDirectory.exists()) {
@@ -535,10 +563,10 @@ public class ProGuardMojo extends AbstractMojo {
 		ClassLoader cl;
 		cl = mojo.getClass().getClassLoader();
 		// cl = Thread.currentThread().getContextClassLoader();
-		String classResource = "/" + proguardMainClass.replace('.', '/') + ".class";
+		String classResource = "/" + mojo.proguardMainClass.replace('.', '/') + ".class";
 		URL url = cl.getResource(classResource);
 		if (url == null) {
-			throw new MojoExecutionException("Obfuscation failed ProGuard (" + proguardMainClass
+			throw new MojoExecutionException("Obfuscation failed ProGuard (" + mojo.proguardMainClass
 					+ ") not found in classpath");
 		}
 		String proguardJar = url.toExternalForm();
@@ -575,7 +603,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 		java.createClasspath().setLocation(proguardJar);
 		// java.createClasspath().setPath(System.getProperty("java.class.path"));
-		java.setClassname(proguardMainClass);
+		java.setClassname(mojo.proguardMainClass);
 
 		java.setFailonerror(true);
 
