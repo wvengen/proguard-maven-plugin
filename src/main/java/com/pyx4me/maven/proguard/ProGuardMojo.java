@@ -123,12 +123,17 @@ public class ProGuardMojo extends AbstractMojo {
 	private List exclusions;
 
 	/**
-	 * Specifies the input jar name (or wars, ears, zips) of the application to be processed.
-	 * 
-	 * @parameter expression="${project.build.finalName}.jar"
-	 * @required
-	 */
-	protected String injar;
+     * Specifies the input jar name (or wars, ears, zips) of the application to be
+     * processed.
+     * 
+     * You may specify a classes directory e.g. 'classes'. This way plugin will processed
+     * the classes instead of jar. You would need to bind the execution to phase 'compile'
+     * or 'process-classes' in this case.
+     * 
+     * @parameter expression="${project.build.finalName}.jar"
+     * @required
+     */
+    protected String injar;
 
 	/**
 	 * Set this to 'true' to bypass ProGuard processing when injar does not exists.
@@ -313,16 +318,21 @@ public class ProGuardMojo extends AbstractMojo {
 			sameArtifact = false;
 			outJarFile = (new File(outputDirectory, outjar)).getAbsoluteFile();
 			if (outJarFile.exists()) {
-				if (!outJarFile.delete()) {
+			    if (!deleteFileOrDirectory(outJarFile)) {
 					throw new MojoFailureException("Can't delete " + outJarFile);
 				}
 			}
 		} else {
 			sameArtifact = true;
 			outJarFile = inJarFile.getAbsoluteFile();
-			File baseFile = new File(outputDirectory, nameNoType(injar) + "_proguard_base.jar");
+			File baseFile;
+			if (inJarFile.isDirectory()) {
+			    baseFile = new File(outputDirectory, nameNoType(injar) + "_proguard_base");
+			} else {
+			    baseFile = new File(outputDirectory, nameNoType(injar) + "_proguard_base.jar");
+		    }
 			if (baseFile.exists()) {
-				if (!baseFile.delete()) {
+				if (!deleteFileOrDirectory(baseFile)) {
 					throw new MojoFailureException("Can't delete " + baseFile);
 				}
 			}
@@ -624,9 +634,34 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 	}
 
-	private static String nameNoType(String artifactname) {
-		return artifactname.substring(0, artifactname.lastIndexOf('.'));
+	private static String nameNoType(String fileName) {
+	    int extStart = fileName.lastIndexOf('.');
+	    if (extStart == -1) {
+	        return fileName;
+	    }
+		return fileName.substring(0, extStart);
 	}
+	
+	private static boolean deleteFileOrDirectory(File path) throws MojoFailureException {
+        if (path.isDirectory()) {
+            File[] files = path.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    if (!deleteFileOrDirectory(files[i])) {
+                        throw new MojoFailureException("Can't delete dir " + files[i]);    
+                    }
+                } else {
+                    if (!files[i].delete()) {
+                        throw new MojoFailureException("Can't delete file " + files[i]);  
+                    }
+                }
+            }
+            return path.delete();
+        } else {
+            return path.delete();
+        }
+    }
+
 
 	private static Artifact getDependancy(Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
 		Set dependancy = mavenProject.getArtifacts();
