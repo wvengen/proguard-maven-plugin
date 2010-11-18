@@ -24,6 +24,13 @@ import java.util.List;
 
 public class Assembly {
 
+    /**
+     * Automatically add !META-INF/MANIFEST.MF filter when creating assembly jar
+     * 
+     * @parameter
+     */
+    protected boolean filterManifest = true;
+    
 	protected List inclusions;
 
 }

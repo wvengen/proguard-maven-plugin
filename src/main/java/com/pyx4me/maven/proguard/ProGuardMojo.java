@@ -375,7 +375,9 @@ public class ProGuardMojo extends AbstractMojo {
 					inPath.add(file.toString());
 					log.debug("--- ADD injars:" + inc.artifactId);
 					StringBuffer filter = new StringBuffer(fileToString(file));
-					filter.append("(!META-INF/MANIFEST.MF");
+					if (assembly.filterManifest) {
+					    filter.append("(!META-INF/MANIFEST.MF");
+					}
 					if (!addMavenDescriptor) {
 						filter.append(",");
 						filter.append("!META-INF/maven/**");
