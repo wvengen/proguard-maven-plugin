@@ -1,0 +1,9 @@
+ProGuard Maven Plugin
+---------------------
+  with support for the modularised ProGuard Maven modules
+
+Original homepage:
+  http://pyx4me.com/pyx4me-maven-plugins/proguard-maven-plugin/
+This fork supports modularised ProGuard Maven modules as well, which has
+currently (June, 2011) more recent versions in Maven Central.
+
