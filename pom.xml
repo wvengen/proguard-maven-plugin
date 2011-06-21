@@ -20,6 +20,7 @@
     <packaging>maven-plugin</packaging>
 
     <description>Maven 2 Plugin for ProGuard</description>
+    <url>http://github.com/wvengen/proguard-maven-plugin</url>
 
     <licenses>
         <license>
@@ -27,6 +28,11 @@
             <url>http://www.gnu.org/licenses/lgpl.html</url>
         </license>
     </licenses>
+
+    <scm>
+        <url>http://github.com/wvengen/proguard-maven-plugin</url>
+        <connection>scm:git:git://github.com/wvengen/proguard-maven-plugin.git</connection>
+    </scm>
 
     <dependencies>
 
@@ -60,43 +66,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- Copy from maven-jar-plugin-2.2 to make this one work with maven-archiver 2.3 -->
-        <!--dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-archiver</artifactId>
-            <version>1.0-alpha-9</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-container-default</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-component-api</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-io</artifactId>
-            <version>1.0-alpha-1</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-container-default</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-component-api</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>1.4.9</version>
-        </dependency-->
 
     </dependencies>
 
