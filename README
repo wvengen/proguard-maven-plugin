@@ -5,6 +5,8 @@ ProGuard Maven Plugin
 Original homepage:
   http://pyx4me.com/pyx4me-maven-plugins/proguard-maven-plugin/
 This fork supports modularised ProGuard Maven modules as well, which has
-currently (June, 2011) more recent versions in Maven Central.
+currently (June, 2011) more recent versions in Maven Central. Instead of
+the dependency net.sf.proguard:proguard you can now also use
+net.sf.proguard:proguard-base (or any of the other modules). Please see the
+original proguard-maven-plugin for more information.
   https://github.com/wvengen/proguard-maven-plugin
-
