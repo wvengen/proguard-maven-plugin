@@ -549,7 +549,7 @@ public class ProGuardMojo extends AbstractMojo {
 		for (Iterator i = mojo.pluginArtifacts.iterator(); i.hasNext();) {
 			Artifact artifact = (Artifact) i.next();
 			mojo.getLog().debug("pluginArtifact: " + artifact.getFile());
-			if ("proguard".equals(artifact.getArtifactId())) {
+			if (artifact.getArtifactId().startsWith("proguard")) {
 				int distance = artifact.getDependencyTrail().size();
 				mojo.getLog().debug("proguard DependencyTrail: " + distance);
 				if ((mojo.proguardVersion != null) && (mojo.proguardVersion.equals(artifact.getVersion()))) {
