@@ -18,12 +18,8 @@
  * @author vlads
  * @version $Id$
  */
-package com.pyx4me.maven.proguard;
+package com.github.wvengen.maven.proguard;
 
-import java.util.List;
-
-public class Assembly {
-
-	protected List inclusions;
+public class Exclusion extends ArtifactFilter {
 
 }

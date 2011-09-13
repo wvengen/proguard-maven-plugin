@@ -18,7 +18,7 @@
  * @author vlads
  * @version $Id$
  */
-package com.pyx4me.maven.proguard;
+package com.github.wvengen.maven.proguard;
 
 import org.apache.maven.artifact.Artifact;
 

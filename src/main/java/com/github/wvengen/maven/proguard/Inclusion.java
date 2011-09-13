@@ -18,8 +18,11 @@
  * @author vlads
  * @version $Id$
  */
-package com.pyx4me.maven.proguard;
+package com.github.wvengen.maven.proguard;
 
-public class Exclusion extends ArtifactFilter {
+public class Inclusion extends ArtifactFilter {
 
+	protected boolean library = false;
+
+	protected String filter;
 }

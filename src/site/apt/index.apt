@@ -97,7 +97,7 @@ proguard-maven-plugin
     <build>
         <plugins>
             <plugin>
-                <groupId>com.pyx4me</groupId>
+                <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
                 <executions>
                    <execution>
@@ -125,7 +125,7 @@ proguard-maven-plugin
     <build>
         <plugins>
             <plugin>
-                <groupId>com.pyx4me</groupId>
+                <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
                 <executions>
                    <execution>
@@ -180,7 +180,7 @@ proguard-maven-plugin
         <plugins>
 
             <plugin>
-                <groupId>com.pyx4me</groupId>
+                <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
                 <executions>
                    <execution>
@@ -229,7 +229,7 @@ proguard-maven-plugin
     <build>
         <plugins>
             <plugin>
-                <groupId>com.pyx4me</groupId>
+                <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
                 <executions>
                    <execution>
@@ -238,7 +238,7 @@ proguard-maven-plugin
                    </execution>
                 </executions>
                 <configuration>
-                    <proguardVersion>4.0betta1</proguardVersion>
+                    <proguardVersion>4.5</proguardVersion>
                     <libs>
                         <lib>${java.home}/lib/rt.jar</lib>
                     </libs>
@@ -246,8 +246,8 @@ proguard-maven-plugin
                 <dependencies>
                     <dependency>
                         <groupId>net.sf.proguard</groupId>
-                        <artifactId>proguard</artifactId>
-                        <version>4.0betta1</version>
+                        <artifactId>proguard-base</artifactId>
+                        <version>4.5</version>
                         <scope>runtime</scope>
                     </dependency>
                 </dependencies>
