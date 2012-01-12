@@ -549,7 +549,8 @@ public class ProGuardMojo extends AbstractMojo {
 		for (Iterator i = mojo.pluginArtifacts.iterator(); i.hasNext();) {
 			Artifact artifact = (Artifact) i.next();
 			mojo.getLog().debug("pluginArtifact: " + artifact.getFile());
-			if (artifact.getArtifactId().startsWith("proguard")) {
+			if (artifact.getArtifactId().startsWith("proguard") &&
+			   !artifact.getArtifactId().startsWith("proguard-maven-plugin")) {
 				int distance = artifact.getDependencyTrail().size();
 				mojo.getLog().debug("proguard DependencyTrail: " + distance);
 				if ((mojo.proguardVersion != null) && (mojo.proguardVersion.equals(artifact.getVersion()))) {
