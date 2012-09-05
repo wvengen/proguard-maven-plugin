@@ -53,6 +53,7 @@ import org.codehaus.plexus.archiver.jar.JarArchiver;
  * @phase package
  * @description Create small jar files using ProGuard
  * @requiresDependencyResolution compile
+ * @threadSafe
  */
 
 public class ProGuardMojo extends AbstractMojo {
@@ -227,7 +228,7 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * The Jar archiver.
 	 * 
-	 * @parameter expression="${component.org.codehaus.plexus.archiver.Archiver#jar}"
+	 * @component role="org.codehaus.plexus.archiver.Archiver" roleHint="jar"
 	 * @required
 	 */
 	private JarArchiver jarArchiver;
