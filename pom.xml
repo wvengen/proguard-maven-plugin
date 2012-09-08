@@ -39,7 +39,7 @@
         <dependency>
             <groupId>net.sf.proguard</groupId>
             <artifactId>proguard-base</artifactId>
-            <version>4.5</version>
+            <version>4.8</version>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
@@ -80,7 +80,3 @@
     </build>
 
 </project>
-
-
-
-
