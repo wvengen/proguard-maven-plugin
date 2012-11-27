@@ -79,7 +79,15 @@ public class ProGuardMojo extends AbstractMojo {
 	 */
 	private String proguardVersion;
 
-	/**
+        /**
+         * The name of the jar file containing the ProGuard main class.
+         * To run DexGuard instead of ProGuard, use value "dexguard".
+         *
+	 * @parameter default-value="proguard"
+         */
+        private String proguardJar;
+
+        /**
 	 * ProGuard configuration options
 	 * 
 	 * @parameter
@@ -542,7 +550,7 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 	}
 
-	private static File getProguardJar(ProGuardMojo mojo) throws MojoExecutionException {
+	private File getProguardJar(ProGuardMojo mojo) throws MojoExecutionException {
 
 		Artifact proguardArtifact = null;
 		int proguardArtifactDistance = -1;
@@ -550,7 +558,7 @@ public class ProGuardMojo extends AbstractMojo {
 		for (Iterator i = mojo.pluginArtifacts.iterator(); i.hasNext();) {
 			Artifact artifact = (Artifact) i.next();
 			mojo.getLog().debug("pluginArtifact: " + artifact.getFile());
-			if (artifact.getArtifactId().startsWith("proguard") &&
+			if (artifact.getArtifactId().startsWith(proguardJar) &&
 			   !artifact.getArtifactId().startsWith("proguard-maven-plugin")) {
 				int distance = artifact.getDependencyTrail().size();
 				mojo.getLog().debug("proguard DependencyTrail: " + distance);
