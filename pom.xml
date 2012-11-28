@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://maven.apache.org/POM/4.0.0">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!-- @version $Revision$ ($Author$) $Date$ -->
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,7 +13,7 @@
     <groupId>com.github.wvengen</groupId>
     <artifactId>proguard-maven-plugin</artifactId>
     <name>proguard-maven-plugin</name>
-    <version>2.0.7-SNAPSHOT</version>
+    <version>2.0.7-dexguard-beta</version>
     <packaging>maven-plugin</packaging>
 
     <description>Maven 2 Plugin for ProGuard</description>
@@ -30,8 +27,13 @@
     </licenses>
 
     <scm>
-        <url>http://github.com/ariiber/proguard-maven-plugin</url>
-        <connection>scm:git:git://github.com/ariiber/proguard-maven-plugin.git</connection>
+        <url>http://github.com/ariiber/proguard-maven-plugin/tags/proguard-maven-plugin-2.0.7-dexguard-beta</url>
+        <connection>
+            scm:git:git@github.com/ariiber/proguard-maven-plugin.git
+        </connection>
+        <developerConnection>
+            scm:git:git@github.com/ariiber/proguard-maven-plugin.git
+        </developerConnection>
     </scm>
 
     <dependencies>
