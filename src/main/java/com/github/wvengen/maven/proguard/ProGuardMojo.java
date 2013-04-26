@@ -282,20 +282,15 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 
 		boolean mainIsJar = mavenProject.getPackaging().equals("jar");
-		boolean mainIsPom = mavenProject.getPackaging().equals("pom");
 
 		File inJarFile = new File(outputDirectory, injar);
-		if (mainIsJar && (!inJarFile.exists())) {
+		if (!inJarFile.exists()) {
 			if (injarNotExistsSkip) {
 				log.info("Bypass ProGuard processing because \"injar\" dos not exist");
 				return;
+			} else if (mainIsJar) {
+				throw new MojoFailureException("Can't find file " + inJarFile);
 			}
-			throw new MojoFailureException("Can't find file " + inJarFile);
-		}
-
-		if (mainIsPom && (!inJarFile.exists()) && injarNotExistsSkip) {
-			log.info("Bypass ProGuard processing because \"injar\" dos not exist");
-			return;
 		}
 
 		if (!outputDirectory.exists()) {
@@ -399,7 +394,7 @@ public class ProGuardMojo extends AbstractMojo {
 			}
 		}
 
-		if ((!mainIsPom) && inJarFile.exists()) {
+		if (inJarFile.exists()) {
 			args.add("-injars");
 			StringBuffer filter = new StringBuffer(fileToString(inJarFile));
 			if ((inFilter != null) || (!addMavenDescriptor)) {
@@ -422,8 +417,11 @@ public class ProGuardMojo extends AbstractMojo {
 			}
 			args.add(filter.toString());
 		}
-		args.add("-outjars");
-		args.add(fileToString(outJarFile));
+
+		if (args.contains("-injars")) {
+			args.add("-outjars");
+			args.add(fileToString(outJarFile));
+		}
 
 		if (!obfuscate) {
 			args.add("-dontobfuscate");
