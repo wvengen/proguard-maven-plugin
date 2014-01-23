@@ -22,6 +22,10 @@ package com.github.wvengen.maven.proguard;
 
 import org.apache.maven.artifact.Artifact;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 public class ArtifactFilter {
 
     private static final String WILDCARD = "*";
@@ -33,11 +37,24 @@ public class ArtifactFilter {
     protected String classifier;
 
     public boolean match(Artifact artifact) {
-        boolean artifactMatch = WILDCARD.equals(artifactId) || artifact.getArtifactId().equals(this.artifactId);
+        boolean artifactMatch = WILDCARD.equals(artifactId) || artifact.getArtifactId().equals(this.artifactId) ||
+                (artifactId != null && getMatcher(artifact).matches());
         boolean groupMatch = artifact.getGroupId().equals(this.groupId);
-        boolean classifierMatch = ((this.classifier == null) && (artifact
-                .getClassifier() == null)) || ((this.classifier != null) && this.classifier.equals(artifact
-                .getClassifier()));
+        boolean classifierMatch = ((this.classifier == null) && (artifact.getClassifier() == null)) || ((this.classifier != null) && this.classifier.equals(artifact.getClassifier()));
         return artifactMatch && groupMatch && classifierMatch;
+    }
+
+    private Matcher getMatcher(Artifact artifact) {
+        try {
+            Pattern compile = Pattern.compile(artifactId);
+            return compile.matcher(artifact.getArtifactId());
+        } catch (PatternSyntaxException e) {
+            throw new IllegalArgumentException("Invalid regex artifact filter: " + this, e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "groupId:" + groupId + ", artifactId:" + artifactId + ", classifier:" + classifier;
     }
 }

@@ -1,32 +1,24 @@
 /**
  * Pyx4me framework
  * Copyright (C) 2006-2008 pyx4j.com.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
- * 
+ *
  * @author vlads
  * @version $Id$
  */
 package com.github.wvengen.maven.proguard;
-
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
@@ -43,12 +35,16 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
+import java.io.File;
+import java.net.URL;
+import java.util.*;
+
 /**
- * 
+ *
  * <p>
  * The Obfuscate task provides a stand-alone obfuscation task
  * </p>
- * 
+ *
  * @goal proguard
  * @phase package
  * @description Create small jar files using ProGuard
@@ -60,35 +56,35 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * Set this to 'true' to bypass ProGuard processing entirely.
-	 * 
-	 * @parameter expression="${proguard.skip}"
+	 *
+	 * @parameter property="${proguard.skip}"
 	 */
 	private boolean skip;
 
 	/**
 	 * Recursively reads configuration options from the given file filename
-	 * 
+	 *
 	 * @parameter default-value="${basedir}/proguard.conf"
 	 */
 	private File proguardInclude;
 
 	/**
 	 * Select specific ProGuard version from plugin dependencies
-	 * 
+	 *
 	 * @parameter
 	 */
 	private String proguardVersion;
 
 	/**
 	 * ProGuard configuration options
-	 * 
+	 *
 	 * @parameter
 	 */
 	private String[] options;
 
 	/**
 	 * Specifies not to obfuscate the input class files.
-	 * 
+	 *
 	 * @parameter default-value="true"
 	 */
 	private boolean obfuscate;
@@ -96,14 +92,14 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * Specifies that project compile dependencies be added as -libraryjars to proguard arguments. Dependency itself is
 	 * not included in resulting jar
-	 * 
+	 *
 	 * @parameter default-value="true"
 	 */
 	private boolean includeDependency;
 
 	/**
 	 * Bundle project dependency to resulting jar. Specifies list of artifact inclusions
-	 * 
+	 *
 	 * @parameter
 	 */
 	private Assembly assembly;
@@ -111,14 +107,14 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * Additional -libraryjars e.g. ${java.home}/lib/rt.jar Project compile dependency are added automatically. See
 	 * exclusions
-	 * 
+	 *
 	 * @parameter
 	 */
 	private List libs;
 
 	/**
 	 * List of dependency exclusions
-	 * 
+	 *
 	 * @parameter
 	 */
 	private List exclusions;
@@ -126,26 +122,26 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
      * Specifies the input jar name (or wars, ears, zips) of the application to be
      * processed.
-     * 
+     *
      * You may specify a classes directory e.g. 'classes'. This way plugin will processed
      * the classes instead of jar. You would need to bind the execution to phase 'compile'
      * or 'process-classes' in this case.
-     * 
-     * @parameter expression="${project.build.finalName}.jar"
+     *
+     * @parameter property="${project.build.finalName}.jar"
      * @required
      */
     protected String injar;
 
 	/**
 	 * Set this to 'true' to bypass ProGuard processing when injar does not exists.
-	 * 
+	 *
 	 * @parameter default-value="false"
 	 */
 	private boolean injarNotExistsSkip;
 
 	/**
 	 * Apply ProGuard classpathentry Filters to input jar. e.g. <code>!**.gif,!**&#47;tests&#47;**'</code>
-	 * 
+	 *
 	 * @parameter
 	 */
 	protected String inFilter;
@@ -153,50 +149,50 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * Specifies the names of the output jars. If attach=true the value ignored and name constructed base on classifier
 	 * If empty input jar would be overdriven.
-	 * 
+	 *
 	 * @parameter
 	 */
 	protected String outjar;
 
 	/**
 	 * Specifies whether or not to attach the created artifact to the project
-	 * 
+	 *
 	 * @parameter default-value="false"
 	 */
 	private boolean attach = false;
 
 	/**
 	 * Specifies attach artifact type
-	 * 
+	 *
 	 * @parameter default-value="jar"
 	 */
 	private String attachArtifactType;
 
 	/**
 	 * Specifies attach artifact Classifier, Ignored if attach=false
-	 * 
+	 *
 	 * @parameter default-value="small"
 	 */
 	private String attachArtifactClassifier;
 
 	/**
 	 * Set to false to exclude the attachArtifactClassifier from the Artifact final name. Default value is true.
-	 * 
+	 *
 	 * @parameter default-value="true"
 	 */
 	private boolean appendClassifier;
 
 	/**
 	 * Set to true to include META-INF/maven/** maven descriptord
-	 * 
+	 *
 	 * @parameter default-value="false"
 	 */
 	private boolean addMavenDescriptor;
 
 	/**
 	 * Directory containing the input and generated JAR.
-	 * 
-	 * @parameter expression="${project.build.directory}"
+	 *
+	 * @parameter property="${project.build.directory}"
 	 * @required
 	 */
 	protected File outputDirectory;
@@ -204,8 +200,8 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * The Maven project reference where the plugin is currently being executed. The default value is populated from
 	 * maven.
-	 * 
-	 * @parameter expression="${project}"
+	 *
+	 * @parameter property="${project}"
 	 * @readonly
 	 * @required
 	 */
@@ -213,8 +209,8 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * The plugin dependencies.
-	 * 
-	 * @parameter expression="${plugin.artifacts}"
+	 *
+	 * @parameter property="${plugin.artifacts}"
 	 * @required
 	 * @readonly
 	 */
@@ -227,7 +223,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * The Jar archiver.
-	 * 
+	 *
 	 * @component role="org.codehaus.plexus.archiver.Archiver" roleHint="jar"
 	 * @required
 	 */
@@ -235,21 +231,21 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * The maven archive configuration to use. only if assembly is used.
-	 * 
+	 *
 	 * @parameter
 	 */
 	protected MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
 	/**
 	 * The max memory the forked java process should use, e.g. 256m
-	 * 
+	 *
 	 * @parameter
 	 */
 	protected String maxMemory;
 
 	/**
 	 * ProGuard main class name.
-	 * 
+	 *
 	 * @parameter default-value="proguard.ProGuard"
 	 */
 	protected String proguardMainClass = "proguard.ProGuard";
@@ -643,18 +639,18 @@ public class ProGuardMojo extends AbstractMojo {
 	    }
 		return fileName.substring(0, extStart);
 	}
-	
+
 	private static boolean deleteFileOrDirectory(File path) throws MojoFailureException {
         if (path.isDirectory()) {
             File[] files = path.listFiles();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isDirectory()) {
                     if (!deleteFileOrDirectory(files[i])) {
-                        throw new MojoFailureException("Can't delete dir " + files[i]);    
+                        throw new MojoFailureException("Can't delete dir " + files[i]);
                     }
                 } else {
                     if (!files[i].delete()) {
-                        throw new MojoFailureException("Can't delete file " + files[i]);  
+                        throw new MojoFailureException("Can't delete file " + files[i]);
                     }
                 }
             }
