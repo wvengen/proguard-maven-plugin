@@ -57,7 +57,7 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * Set this to 'true' to bypass ProGuard processing entirely.
 	 *
-	 * @parameter property="${proguard.skip}"
+	 * @parameter property="proguard.skip"
 	 */
 	private boolean skip;
 
@@ -135,7 +135,7 @@ public class ProGuardMojo extends AbstractMojo {
      * the classes instead of jar. You would need to bind the execution to phase 'compile'
      * or 'process-classes' in this case.
      *
-     * @parameter property="${project.build.finalName}.jar"
+     * @parameter expression="${project.build.finalName}.jar"
      * @required
      */
     protected String injar;
@@ -200,7 +200,7 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * Directory containing the input and generated JAR.
 	 *
-	 * @parameter property="${project.build.directory}"
+	 * @parameter property="project.build.directory"
 	 * @required
 	 */
 	protected File outputDirectory;
@@ -209,7 +209,7 @@ public class ProGuardMojo extends AbstractMojo {
 	 * The Maven project reference where the plugin is currently being executed. The default value is populated from
 	 * maven.
 	 *
-	 * @parameter property="${project}"
+	 * @parameter property="project"
 	 * @readonly
 	 * @required
 	 */
@@ -218,7 +218,7 @@ public class ProGuardMojo extends AbstractMojo {
 	/**
 	 * The plugin dependencies.
 	 *
-	 * @parameter property="${plugin.artifacts}"
+	 * @parameter property="plugin.artifacts"
 	 * @required
 	 * @readonly
 	 */
