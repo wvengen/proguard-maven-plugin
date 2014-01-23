@@ -68,6 +68,15 @@ proguard-maven-plugin
                 <groupId>org.microemu</groupId><artifactId>microemu-javase-swing</artifactId>
             </inclusion>
         </inclusions>
+        <exclusions>
+                <!-- artifactId supports wildcard for all artifacts or a regex for partial matching -->
+             <exclusion>
+                <groupId>org.thirdparty1</groupId><artifactId>*</artifactId>
+             </exclusion>
+             <exclusion>
+                 <groupId>org.thirdparty2</groupId><artifactId>util.*</artifactId>
+             </exclusion>
+        </exclusions
     </assembly>
 ---
 
