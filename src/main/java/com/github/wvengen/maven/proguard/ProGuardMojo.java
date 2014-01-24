@@ -95,11 +95,19 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * Specifies that project compile dependencies be added as -libraryjars to proguard arguments. Dependency itself is
-	 * not included in resulting jar
+	 * not included in resulting jar unless you set includeDependencyInjar to true
 	 * 
 	 * @parameter default-value="true"
 	 */
 	private boolean includeDependency;
+
+
+	/**
+	 * Specifies that project compile dependencies should be added as injar.
+	 * 
+	 * @parameter default-value="false"
+	 */
+	private boolean includeDependencyInjar;
 
 	/**
 	 * Bundle project dependency to resulting jar. Specifies list of artifact inclusions
@@ -418,6 +426,33 @@ public class ProGuardMojo extends AbstractMojo {
 			args.add(filter.toString());
 		}
 
+
+		if (includeDependency) {
+			List dependency = this.mavenProject.getCompileArtifacts();
+			for (Iterator i = dependency.iterator(); i.hasNext();) {
+				Artifact artifact = (Artifact) i.next();
+				// dependency filter
+				if (isExclusion(artifact)) {
+					continue;
+				}
+				File file = getClasspathElement(artifact, mavenProject);
+
+				if (inPath.contains(file.toString())) {
+					log.debug("--- ignore library since one in injar:" + artifact.getArtifactId());
+					continue;
+				}
+				if(includeDependencyInjar){
+					log.debug("--- ADD library as injars:" + artifact.getArtifactId());
+					args.add("-injars");
+				} else {
+					log.debug("--- ADD libraryjars:" + artifact.getArtifactId());
+					args.add("-libraryjars");
+
+				}
+				args.add(fileToString(file));
+			}
+		}
+
 		if (args.contains("-injars")) {
 			args.add("-outjars");
 			args.add(fileToString(outJarFile));
@@ -434,26 +469,6 @@ public class ProGuardMojo extends AbstractMojo {
 				log.debug("proguardInclude " + proguardInclude);
 			} else {
 				log.debug("proguardInclude config does not exists " + proguardInclude);
-			}
-		}
-
-		if (includeDependency) {
-			List dependency = this.mavenProject.getCompileArtifacts();
-			for (Iterator i = dependency.iterator(); i.hasNext();) {
-				Artifact artifact = (Artifact) i.next();
-				// dependency filter
-				if (isExclusion(artifact)) {
-					continue;
-				}
-				File file = getClasspathElement(artifact, mavenProject);
-
-				if (inPath.contains(file.toString())) {
-					log.debug("--- ignore libraryjars since one in injar:" + artifact.getArtifactId());
-					continue;
-				}
-				log.debug("--- ADD libraryjars:" + artifact.getArtifactId());
-				args.add("-libraryjars");
-				args.add(fileToString(file));
 			}
 		}
 
