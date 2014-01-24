@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+<html>
+  <head>
+    <title>Maven proguard Plug-In - Overview</title>
+    <style type="text/css" media="all">
+      @import url("./css/maven-base.css");
+      @import url("./css/maven-theme.css");
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      </head>
+  <body class="composite">
+    <div id="banner">
+                    <span id="bannerLeft">
+    
+            proguard-maven-plugin
+    
+            </span>
+                        <a href="http://pyx4me.com/" id="bannerRight">
+    
+                                    <img src="http://pyx4me.com/snapshot/pyx4me/images/logo.png" alt="" />
+    
+            </a>
+            <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="breadcrumbs">
+          
+  
+
+  
+    
+  
+  
+            <div class="xleft">
+        Last Published: Jan-24-2014 13:42 UTC GMT+0000
+                      </div>
+            <div class="xright">      <a href="http://maven.apache.org/maven2/">Maven 2</a>
+          
+  
+
+  
+    
+  
+  
+  </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+           
+  
+
+  
+    
+  
+  
+                   <h5>Ver 2.0.7-SNAPSHOT</h5>
+        <ul>
+          </ul>
+          <h5>Maven proguard Quickstart</h5>
+        <ul>
+              
+    <li class="none">
+              <strong>Introduction</strong>
+        </li>
+              
+    <li class="none">
+              <a href="plugin-info.html">Plugin Goals</a>
+        </li>
+          </ul>
+          <h5>Parent Project</h5>
+        <ul>
+              
+    <li class="none">
+              <a href="http://www.pyx4me.com/pyx4me-maven-plugins/index.html">pyx4me-maven-plugins</a>
+        </li>
+          </ul>
+                                       <a href="http://maven.apache.org/" title="Built by Maven" id="poweredBy">
+            <img alt="Built by Maven" src="./images/logos/maven-feather.png"></img>
+          </a>
+                       
+  
+
+  
+    
+  
+  
+        </div>
+    </div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        <div class="section"><h2>proguard-maven-plugin</h2><div class="section"><h3>Overview</h3><p>The proguard-maven-plugin is maven2 plugin to execute <a href="http://proguard.sourceforge.net/">ProGuard</a></p></div><div class="section"><h3>Parameters</h3><p>Regular <a href="proguard-mojo.html">proguard:proguard parameters</a></p><ul><li><tt>libs</tt> JVM libraries usually not in dependency list<div class="source"><pre>    &lt;libs&gt;
+        &lt;lib&gt;${java.home}/lib/rt.jar&lt;/lib&gt;
+        &lt;lib&gt;${java.home}/lib/jsse.jar&lt;/lib&gt;
+    &lt;/libs&gt;</pre></div></li><li>You can use <tt>inFilter</tt> to apply ProGuard <a href="http://proguard.sourceforge.net/manual/usage.html#filters">classpathentry Filters</a> to input jar<div class="source"><pre>    &lt;inFilter&gt;!org/microemu/app/classloader/**&lt;/inFilter&gt;</pre></div></li><li><tt>exclusions</tt> allow fine grain filter for dependency if includeDependency is enabled<div class="source"><pre>    &lt;exclusions&gt;
+        &lt;exclusion&gt;
+            &lt;groupId&gt;org.grp&lt;/groupId&gt;&lt;artifactId&gt;art1&lt;/artifactId&gt;
+        &lt;/exclusion&gt;
+        &lt;exclusion&gt;
+            &lt;!-- org.grp:art2 without classifier will still be included --&gt;
+            &lt;groupId&gt;org.grp&lt;/groupId&gt;&lt;artifactId&gt;art2&lt;/artifactId&gt;&lt;classifier&gt;app&lt;classifier&gt;
+        &lt;/exclusion&gt;
+    &lt;/exclusions&gt;</pre></div></li><li><tt>assembly</tt> allows to bundle project dependency to resulting jar with different options e.g. -injars ProGuard args. Some flagged as <tt>library</tt> doesn`t need to be processed by ProGuard are added as -libraryjars and added to resulting jar by plugin after ProGuard is finished. For clarity param <tt>includeDependency</tt> will just add -libraryjars arg to ProGuard and Dependency is not included in resulting jar.<p>You can use <tt>assembly</tt> to apply ProGuard <a href="http://proguard.sourceforge.net/manual/usage.html#filters">classpathentry Filters</a> to dependency jars</p><div class="source"><pre>    &lt;assembly&gt;
+        &lt;inclusions&gt;
+            &lt;inclusion&gt;
+                &lt;!-- add jar already prepossessed with different options --&gt;
+                &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-cldc&lt;/artifactId&gt;&lt;classifier&gt;4applet&lt;/classifier&gt;&lt;library&gt;true&lt;/library&gt;
+                &lt;!-- filter will not apply --&gt;
+            &lt;/inclusion&gt;
+            &lt;inclusion&gt;
+                &lt;!-- filter out some classes see ProGuard classpathentry Filters --&gt;
+                &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-javase&lt;/artifactId&gt;
+                &lt;filter&gt;!org/microemu/app/classloader/**&lt;/filter&gt;
+            &lt;/inclusion&gt;
+            &lt;inclusion&gt;
+                &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-javase-swing&lt;/artifactId&gt;
+            &lt;/inclusion&gt;
+        &lt;/inclusions&gt;
+    &lt;/assembly&gt;</pre></div></li><li>ProGuard <tt>options</tt><p>Some ProGuard options are created automatically</p><ul><li><tt>-dontobfuscate</tt> When obfuscate is false</li><li><tt>-libraryjars</tt> Are created base on <tt>libs</tt> and your project dependencies when includeDependency is true (by default).</li><li><tt>-verbose</tt> When executing <tt>maven -X</tt></li><li><tt>-printmapping</tt> $<a name="project.build.directory">project.build.directory</a>/proguard_map.txt and <tt>-printseeds</tt> $<a name="project.build.directory">project.build.directory</a>/proguard_seeds.txt</li></ul><p>Additional ProGuard configuration can be added using <a href="proguard-mojo.html#options">options</a> or <a href="proguard-mojo.html#proguardInclude">proguardInclude</a></p></li></ul></div><div class="section"><h3>Usage</h3><p>Replace project artifact with obfuscated one. Original jar would be preserved in file project.build.finalName.jar_proguard_base.jar</p><div class="source"><pre>    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;com.github.wvengen&lt;/groupId&gt;
+                &lt;artifactId&gt;proguard-maven-plugin&lt;/artifactId&gt;
+                &lt;executions&gt;
+                   &lt;execution&gt;
+                       &lt;phase&gt;package&lt;/phase&gt;
+                       &lt;goals&gt;&lt;goal&gt;proguard&lt;/goal&gt;&lt;/goals&gt;
+                   &lt;/execution&gt;
+                &lt;/executions&gt;
+                &lt;configuration&gt;
+                    &lt;options&gt;
+                        &lt;option&gt;-allowaccessmodification&lt;/option&gt;
+                        &lt;option&gt;-keep public class * extends java.applet.Applet { *; }&lt;/option&gt;
+                    &lt;/options&gt;
+                    &lt;libs&gt;
+                        &lt;lib&gt;${java.home}/lib/rt.jar&lt;/lib&gt;
+                    &lt;/libs&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;</pre></div><p>Create new file $<a name="project.build.finalName">project.build.finalName</a>-small.jar</p><div class="source"><pre>    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;com.github.wvengen&lt;/groupId&gt;
+                &lt;artifactId&gt;proguard-maven-plugin&lt;/artifactId&gt;
+                &lt;executions&gt;
+                   &lt;execution&gt;
+                       &lt;phase&gt;package&lt;/phase&gt;
+                       &lt;goals&gt;&lt;goal&gt;proguard&lt;/goal&gt;&lt;/goals&gt;
+                   &lt;/execution&gt;
+                &lt;/executions&gt;
+                &lt;configuration&gt;
+                    &lt;obfuscate&gt;true&lt;/obfuscate&gt;
+                    &lt;injar&gt;${project.build.finalName}.jar&lt;/injar&gt;
+                    &lt;outjar&gt;${project.build.finalName}-small.jar&lt;/outjar&gt;
+                    &lt;outputDirectory&gt;${project.build.directory}&lt;/outputDirectory&gt;
+                    &lt;proguardInclude&gt;${basedir}/proguard.conf&lt;/proguardInclude&gt;
+                    &lt;libs&gt;
+                        &lt;lib&gt;${java.home}/lib/rt.jar&lt;/lib&gt;
+                        &lt;lib&gt;${java.home}/lib/jsse.jar&lt;/lib&gt;
+                    &lt;/libs&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;</pre></div><p>Complex Applet creation example. See full <a href="http://www.microemu.org/">MicroEmulator</a> project sources for more details</p><div class="source"><pre>
+    &lt;dependencies&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.microemu&lt;/groupId&gt;
+            &lt;artifactId&gt;microemu-midp&lt;/artifactId&gt;
+            &lt;version&gt;${version}&lt;/version&gt;
+            &lt;classifier&gt;4applet&lt;/classifier&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.microemu&lt;/groupId&gt;
+            &lt;artifactId&gt;microemu-javase-swing&lt;/artifactId&gt;
+            &lt;version&gt;${version}&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;sun&lt;/groupId&gt;
+            &lt;artifactId&gt;applet-jsobject&lt;/artifactId&gt;
+            &lt;optional&gt;true&lt;/optional&gt;
+        &lt;/dependency&gt;
+
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+
+            &lt;plugin&gt;
+                &lt;groupId&gt;com.github.wvengen&lt;/groupId&gt;
+                &lt;artifactId&gt;proguard-maven-plugin&lt;/artifactId&gt;
+                &lt;executions&gt;
+                   &lt;execution&gt;
+                       &lt;phase&gt;package&lt;/phase&gt;
+                       &lt;goals&gt;&lt;goal&gt;proguard&lt;/goal&gt;&lt;/goals&gt;
+                   &lt;/execution&gt;
+                &lt;/executions&gt;
+                &lt;configuration&gt;
+                    &lt;proguardInclude&gt;${basedir}/proguard.conf&lt;/proguardInclude&gt;
+                    &lt;assembly&gt;
+                        &lt;inclusions&gt;
+                            &lt;inclusion&gt;
+                                &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-cldc&lt;/artifactId&gt;&lt;classifier&gt;4applet&lt;/classifier&gt;&lt;library&gt;true&lt;/library&gt;
+                            &lt;/inclusion&gt;
+                            &lt;inclusion&gt;
+                                &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-midp&lt;/artifactId&gt;&lt;classifier&gt;4applet&lt;/classifier&gt;&lt;library&gt;true&lt;/library&gt;
+                            &lt;/inclusion&gt;
+                            &lt;inclusion&gt;
+                                &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-javase&lt;/artifactId&gt;
+                                &lt;filter&gt;!org/microemu/app/classloader/**&lt;/filter&gt;
+                            &lt;/inclusion&gt;
+                            &lt;inclusion&gt;
+                                &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-javase-swing&lt;/artifactId&gt;
+                            &lt;/inclusion&gt;
+                        &lt;/inclusions&gt;
+                    &lt;/assembly&gt;
+                    &lt;exclusions&gt;
+                        &lt;exclusion&gt;
+                            &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-midp&lt;/artifactId&gt;
+                        &lt;/exclusion&gt;
+                    &lt;/exclusions&gt;
+                    &lt;libs&gt;
+                        &lt;lib&gt;${java.home}/lib/rt.jar&lt;/lib&gt;
+                        &lt;lib&gt;${java.home}/lib/jsse.jar&lt;/lib&gt;
+                    &lt;/libs&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+
+        &lt;/plugins&gt;
+    &lt;/build&gt;</pre></div><p>Use different version of <a href="http://proguard.sourceforge.net/">ProGuard</a></p><div class="source"><pre>    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;com.github.wvengen&lt;/groupId&gt;
+                &lt;artifactId&gt;proguard-maven-plugin&lt;/artifactId&gt;
+                &lt;executions&gt;
+                   &lt;execution&gt;
+                       &lt;phase&gt;package&lt;/phase&gt;
+                       &lt;goals&gt;&lt;goal&gt;proguard&lt;/goal&gt;&lt;/goals&gt;
+                   &lt;/execution&gt;
+                &lt;/executions&gt;
+                &lt;configuration&gt;
+                    &lt;proguardVersion&gt;4.5&lt;/proguardVersion&gt;
+                    &lt;libs&gt;
+                        &lt;lib&gt;${java.home}/lib/rt.jar&lt;/lib&gt;
+                    &lt;/libs&gt;
+                &lt;/configuration&gt;
+                &lt;dependencies&gt;
+                    &lt;dependency&gt;
+                        &lt;groupId&gt;net.sf.proguard&lt;/groupId&gt;
+                        &lt;artifactId&gt;proguard-base&lt;/artifactId&gt;
+                        &lt;version&gt;4.5&lt;/version&gt;
+                        &lt;scope&gt;runtime&lt;/scope&gt;
+                    &lt;/dependency&gt;
+                &lt;/dependencies&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;</pre></div></div></div>
+      </div>
+    </div>
+    <div class="clear">
+      <hr/>
+    </div>
+    <div id="footer">
+      <div class="xright">&#169;  
+          2006-2014
+    
+          Pyx Software Services Inc.
+          
+  
+
+  
+    
+  
+  
+  </div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script><script type="text/javascript">_uacct = "UA-1249205-4";urchinTracker();</script></body>
+</html>
