@@ -122,14 +122,14 @@ public class ProGuardMojo extends AbstractMojo {
 	 * 
 	 * @parameter
 	 */
-	private List libs;
+	private List<String> libs;
 
 	/**
 	 * List of dependency exclusions
 	 * 
 	 * @parameter
 	 */
-	private List exclusions;
+	private List<String> exclusions;
 
 	/**
      * Specifies the input jar name (or wars, ears, zips) of the application to be
@@ -226,7 +226,7 @@ public class ProGuardMojo extends AbstractMojo {
 	 * @required
 	 * @readonly
 	 */
-	protected List pluginArtifacts;
+	protected List<String> pluginArtifacts;
 
 	/**
 	 * @component
@@ -348,12 +348,13 @@ public class ProGuardMojo extends AbstractMojo {
 			inJarFile = baseFile;
 		}
 
-		ArrayList args = new ArrayList();
+		ArrayList<String> args = new ArrayList<String>();
 
 		if (log.isDebugEnabled()) {
-			List dependancy = mavenProject.getCompileArtifacts();
-			for (Iterator i = dependancy.iterator(); i.hasNext();) {
-				Artifact artifact = (Artifact) i.next();
+			@SuppressWarnings("unchecked")
+			List<Artifact> dependancy = (List<Artifact>) mavenProject.getCompileArtifacts();
+			for (Iterator<Artifact> i = dependancy.iterator(); i.hasNext();) {
+				Artifact artifact =  i.next();
 				log.debug("--- compile artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
 						+ artifact.getType() + ":" + artifact.getClassifier() + " Scope:" + artifact.getScope());
 			}
@@ -369,7 +370,7 @@ public class ProGuardMojo extends AbstractMojo {
 			}
 		}
 
-		Set inPath = new HashSet();
+		Set<String> inPath = new HashSet<String>();
 		boolean hasInclusionLibrary = false;
 		if (assembly != null) {
 			for (Iterator iter = assembly.inclusions.iterator(); iter.hasNext();) {
