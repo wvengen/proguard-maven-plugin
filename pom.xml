@@ -1,82 +1,79 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://maven.apache.org/POM/4.0.0">
-    <!-- @version $Revision$ ($Author$) $Date$ -->
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+	<!-- @version $Revision$ ($Author$) $Date$ -->
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.pyx4me</groupId>
-        <artifactId>pyx4me-maven-plugins</artifactId>
-        <version>2.0.4</version><!--pyx4me-version in official repo-->
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+	<parent>
+		<groupId>com.pyx4me</groupId>
+		<artifactId>pyx4me-maven-plugins</artifactId>
+		<version>2.0.4</version><!--pyx4me-version in official repo -->
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
-    <groupId>com.github.wvengen</groupId>
-    <artifactId>proguard-maven-plugin</artifactId>
-    <name>proguard-maven-plugin</name>
-    <version>2.0.7-SNAPSHOT</version>
-    <packaging>maven-plugin</packaging>
+	<groupId>com.github.wvengen</groupId>
+	<artifactId>proguard-maven-plugin</artifactId>
+	<name>proguard-maven-plugin</name>
+	<version>2.0.7-SNAPSHOT</version>
+	<packaging>maven-plugin</packaging>
 
-    <description>Maven 2 Plugin for ProGuard</description>
-    <url>http://github.com/wvengen/proguard-maven-plugin</url>
+	<description>Maven 2 Plugin for ProGuard</description>
+	<url>http://github.com/wvengen/proguard-maven-plugin</url>
 
-    <licenses>
-        <license>
-            <name>GNU Lesser General Public License (LGPL)</name>
-            <url>http://www.gnu.org/licenses/lgpl.html</url>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License (LGPL)</name>
+			<url>http://www.gnu.org/licenses/lgpl.html</url>
+		</license>
+	</licenses>
 
-    <scm>
-        <url>http://github.com/wvengen/proguard-maven-plugin</url>
-        <connection>scm:git:git://github.com/wvengen/proguard-maven-plugin.git</connection>
-    </scm>
+	<scm>
+		<url>http://github.com/wvengen/proguard-maven-plugin</url>
+		<connection>scm:git:git://github.com/wvengen/proguard-maven-plugin.git</connection>
+	</scm>
 
-    <dependencies>
+	<dependencies>
 
-        <dependency>
-            <groupId>net.sf.proguard</groupId>
-            <artifactId>proguard-base</artifactId>
-            <version>4.9</version>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
+		<dependency>
+			<groupId>net.sf.proguard</groupId>
+			<artifactId>proguard-base</artifactId>
+			<version>4.9</version>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
 
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.6.5</version>
-        </dependency>
+		<dependency>
+			<groupId>ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.6.5</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-archiver</artifactId>
-            <version>2.4</version>
-            <exclusions>
-                <!--
-                    To remove this warning
-                    [WARNING] Artifact junit:junit:jar:3.8.1:test retains local scope 'test' overriding broader scope 'compile'
-                              given by a dependency. If this is not intended, modify or remove the local scope.
-                -->
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-archiver</artifactId>
+			<version>2.4</version>
+			<exclusions>
+				<!-- To remove this warning [WARNING] Artifact junit:junit:jar:3.8.1:test 
+					retains local scope 'test' overriding broader scope 'compile' given by a 
+					dependency. If this is not intended, modify or remove the local scope. -->
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <version>2.9</version>
-                </plugin>
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>2.9</version>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
