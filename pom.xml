@@ -35,6 +35,19 @@
 		<url>https://github.com/wvengen/proguard-maven-plugin/issues</url>
 	</issueManagement>
 
+	<developers>
+		<developer>
+			<id>wvengen</id>
+			<name>wvengen</name>
+			<email>dev-java@willem.engen.nl</email>
+		</developer>
+		<developer>
+			<id>cmorty</id>
+			<name>cmorty</name>
+			<email>morty@gmx.net</email>
+		</developer>
+	</developers>
+
 
 	<dependencies>
 
