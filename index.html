@@ -116,6 +116,15 @@
                 &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-javase-swing&lt;/artifactId&gt;
             &lt;/inclusion&gt;
         &lt;/inclusions&gt;
+        &lt;exclusions&gt;
+                &lt;!-- artifactId supports wildcard for all artifacts or a regex for partial matching --&gt;
+             &lt;exclusion&gt;
+                &lt;groupId&gt;org.thirdparty1&lt;/groupId&gt;&lt;artifactId&gt;*&lt;/artifactId&gt;
+             &lt;/exclusion&gt;
+             &lt;exclusion&gt;
+                 &lt;groupId&gt;org.thirdparty2&lt;/groupId&gt;&lt;artifactId&gt;util.*&lt;/artifactId&gt;
+             &lt;/exclusion&gt;
+        &lt;/exclusions
     &lt;/assembly&gt;</pre></div></li>
 <li>ProGuard <tt>options</tt>
 <p>Some ProGuard options are created automatically</p>
