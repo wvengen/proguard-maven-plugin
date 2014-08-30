@@ -12,7 +12,7 @@
 	<groupId>com.github.wvengen</groupId>
 	<artifactId>proguard-maven-plugin</artifactId>
 	<name>proguard-maven-plugin</name>
-	<version>2.0.8-SNAPSHOT</version>
+	<version>5.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<description>Maven 2 Plugin for ProGuard</description>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>net.sf.proguard</groupId>
 			<artifactId>proguard-base</artifactId>
-			<version>4.11</version>
+			<version>5.0</version>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
