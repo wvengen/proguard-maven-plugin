@@ -8,7 +8,7 @@ Development happens at [Github](https://github.com/wvengen/proguard-maven-plugin
 This plugin is currently not under active development, but pull requests are
 welcome.
 
-This is successor of the [ProGuard Maven Plugin by pyx4me](http://pyx4me.com/pyx4me-maven-plugins/proguard-maven-plugin/).
+This is the successor of the [ProGuard Maven Plugin by pyx4me](http://pyx4me.com/pyx4me-maven-plugins/proguard-maven-plugin/).
 
 
 [![Build Status](https://travis-ci.org/wvengen/proguard-maven-plugin.svg?branch=master)](https://travis-ci.org/wvengen/proguard-maven-plugin)
