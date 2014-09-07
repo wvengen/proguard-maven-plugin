@@ -9,14 +9,14 @@
 	</properties>
 
 
-	<groupId>com.github.wvengen</groupId>
-	<artifactId>proguard-war-maven-plugin</artifactId>
+	<groupId>com.github.radomirml</groupId>
+	<artifactId>proguard-maven-plugin</artifactId>
 	<name>proguard-maven-plugin</name>
 	<version>2.0.9-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<description>Maven 2 Plugin for ProGuard</description>
-	<url>http://github.com/wvengen/proguard-maven-plugin</url>
+	<url>http://github.com/radomirml/proguard-maven-plugin</url>
 
 	<licenses>
 		<license>
@@ -26,16 +26,21 @@
 	</licenses>
 
 	<scm>
-		<url>http://github.com/wvengen/proguard-maven-plugin</url>
-		<connection>scm:git:git://github.com/wvengen/proguard-maven-plugin.git</connection>
+		<url>http://github.com/radomirml/proguard-maven-plugin</url>
+		<connection>scm:git:git://github.com/radomirml/proguard-maven-plugin.git</connection>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/wvengen/proguard-maven-plugin/issues</url>
+		<url>https://github.com/radomirml/proguard-maven-plugin/issues</url>
 	</issueManagement>
 
 	<developers>
+		<developer>
+			<id>radomirml</id>
+			<name>radomirml</name>
+			<email>radomirml@gmail.com</email>
+		</developer>
 		<developer>
 			<id>wvengen</id>
 			<name>wvengen</name>
