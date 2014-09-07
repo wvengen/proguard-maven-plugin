@@ -167,6 +167,13 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String outjar;
 
 	/**
+	 * Apply ProGuard classpathentry Filters to output jar. e.g. <code>!**.gif,!**&#47;tests&#47;**'</code>
+	 *
+	 * @parameter
+	 */
+	protected String outFilter;
+
+	/**
 	 * Specifies whether or not to attach the created artifact to the project
 	 *
 	 * @parameter default-value="false"
@@ -488,26 +495,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if (inJarFile.exists() && !processingWar) {
 			args.add("-injars");
-			StringBuffer filter = new StringBuffer(fileToString(inJarFile));
-			if ((inFilter != null) || (!addMavenDescriptor)) {
-				filter.append("(");
-				boolean coma = false;
-
-				if (!addMavenDescriptor) {
-					coma = true;
-					filter.append("!META-INF/maven/**");
-				}
-
-				if (inFilter != null) {
-					if (coma) {
-						filter.append(",");
-					}
-					filter.append(inFilter);
-				}
-
-				filter.append(")");
-			}
-			args.add(filter.toString());
+			args.add(buildJarReference(inJarFile, inFilter));
 		}
 
 
@@ -539,7 +527,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if (args.contains("-injars")) {
 			args.add("-outjars");
-			args.add(fileToString(outJarFile));
+			args.add(buildJarReference(outJarFile, outFilter));
   	}
 
 		if (!obfuscate) {
@@ -893,5 +881,28 @@ public class ProGuardMojo extends AbstractMojo {
 		expander.setSrc(archiveFile);
 		expander.setDest(destDir);
 		expander.execute();
+	}
+
+	private String buildJarReference(File jarFile, String jarFilter) {
+		StringBuffer filter = new StringBuffer(fileToString(jarFile));
+		if ((jarFilter != null) || (!addMavenDescriptor)) {
+			filter.append("(");
+			boolean coma = false;
+
+			if (!addMavenDescriptor) {
+				coma = true;
+				filter.append("!META-INF/maven/**");
+			}
+
+			if (jarFilter != null) {
+				if (coma) {
+					filter.append(",");
+				}
+				filter.append(jarFilter);
+			}
+
+			filter.append(")");
+		}
+		return filter.toString();
 	}
 }
