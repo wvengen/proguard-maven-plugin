@@ -202,6 +202,50 @@ public class ProGuardMojo extends AbstractMojo {
 	private boolean appendClassifier;
 
 	/**
+	 * Specifies whether or not to attach the created proguard map artifact to the project
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean attachMap = false;
+
+	/**
+	 * Specifies attach proguard map artifact type
+	 *
+	 * @parameter default-value="txt"
+	 */
+	private String attachMapArtifactType = "txt";
+
+	/**
+	 * Specifies attach proguard seed artifact type
+	 *
+	 * @parameter default-value="txt"
+	 */
+	private String attachSeedArtifactType = "txt";
+
+	/**
+	 * Specifies whether or not to attach the created proguard seed artifact to the project
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean attachSeed = false;
+
+	/**
+	 * Specifies attach artifact Classifier, ignored if attachMap=false
+	 *
+	 * @parameter default-value="proguard-map"
+	 */
+	private String attachMapArtifactClassifier = "proguard-map";
+
+	/**
+	 * Specifies attach artifact Classifier, ignored if attachSeed=false
+	 *
+	 * @parameter default-value="proguard-seed"
+	 */
+	private String attachSeedArtifactClassifier = "proguard-seed";
+
+
+
+	/**
 	 * Set to true to include META-INF/maven/** maven descriptord
 	 *
 	 * @parameter default-value="false"
@@ -293,6 +337,14 @@ public class ProGuardMojo extends AbstractMojo {
 
 	private boolean useArtifactClassifier() {
 		return appendClassifier && ((attachArtifactClassifier != null) && (attachArtifactClassifier.length() > 0));
+	}
+
+	private boolean useMapArtifactClassifier() {
+		return ((attachMapArtifactClassifier != null) && (attachMapArtifactClassifier.length() > 0));
+	}
+
+	private boolean useSeedArtifactClassifier() {
+		return ((attachSeedArtifactClassifier != null) && (attachSeedArtifactClassifier.length() > 0));
 	}
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -552,11 +604,13 @@ public class ProGuardMojo extends AbstractMojo {
 			}
 		}
 
+		File proguardMapFile = (new File(outputDirectory, "proguard_map.txt").getAbsoluteFile());
 		args.add("-printmapping");
-		args.add(fileToString((new File(outputDirectory, "proguard_map.txt").getAbsoluteFile())));
+		args.add(fileToString(proguardMapFile));
 
+		File proguardSeedFile = (new File(outputDirectory, "proguard_seeds.txt").getAbsoluteFile());
 		args.add("-printseeds");
-		args.add(fileToString((new File(outputDirectory, "proguard_seeds.txt").getAbsoluteFile())));
+		args.add(fileToString(proguardSeedFile));
 
 		if (log.isDebugEnabled()) {
 			args.add("-verbose");
@@ -664,6 +718,28 @@ public class ProGuardMojo extends AbstractMojo {
 				projectHelper.attachArtifact(mavenProject, attachArtifactType, attachArtifactClassifier, outJarFile);
 			} else {
 				projectHelper.attachArtifact(mavenProject, attachArtifactType, null, outJarFile);
+			}
+		}
+
+		if (attachMap && attach) {
+			if (!proguardMapFile.exists()) {
+				log.warn("Cannot attach proguard map artifact as file does nto exist.");
+			} else if (useMapArtifactClassifier()) {
+				projectHelper.attachArtifact(mavenProject, attachMapArtifactType, attachMapArtifactClassifier, proguardMapFile);
+			} else {
+				throw new MojoExecutionException("Map artifact classifier cannot be empty");
+//				projectHelper.attachArtifact(mavenProject, attachMapArtifactType, null, proguardMapFile);
+			}
+		}
+
+		if (attachSeed && attach) {
+			if (!proguardSeedFile.exists()) {
+				log.warn("Cannot attach proguard seed artifact as file does nto exist.");
+			} else if (useSeedArtifactClassifier()) {
+				projectHelper.attachArtifact(mavenProject, attachSeedArtifactType, attachSeedArtifactClassifier, proguardSeedFile);
+			} else {
+				throw new MojoExecutionException("Seed artifact classifier cannot be empty");
+//				projectHelper.attachArtifact(mavenProject, attachSeedArtifactType, null, proguardSeedFile);
 			}
 		}
 	}
