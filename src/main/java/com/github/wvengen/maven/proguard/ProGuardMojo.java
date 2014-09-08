@@ -374,7 +374,7 @@ public class ProGuardMojo extends AbstractMojo {
 					throw new MojoFailureException("Can't delete " + outJarFile);
 				}
 			}
-			sameArtifact = (outjar != null) && (!outjar.equals(injar));
+			sameArtifact = (outjar != null) && (outjar.equals(injar));
 		} else if ((outjar != null) && (!outjar.equals(injar))) {
 			sameArtifact = false;
 			outJarFile = (new File(outputDirectory, outjar)).getAbsoluteFile();
@@ -656,6 +656,7 @@ public class ProGuardMojo extends AbstractMojo {
 			} catch (Exception e) {
 				throw new MojoExecutionException("Unable to create war", e);
 			}
+			outJarFile = outputWar;
 		}
 
 		if (attach && !sameArtifact) {
