@@ -163,6 +163,13 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String outjar;
 
 	/**
+	 * Apply ProGuard classpathentry Filters to output jar. e.g. <code>!**.gif,!**&#47;tests&#47;**'</code>
+	 *
+	 * @parameter
+	 */
+	protected String outFilter;
+
+	/**
 	 * Specifies whether or not to attach the created artifact to the project
 	 *
 	 * @parameter default-value="false"
@@ -452,7 +459,11 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if (args.contains("-injars")) {
 			args.add("-outjars");
-			args.add(fileToString(outJarFile));
+			StringBuffer filter = new StringBuffer(fileToString(outJarFile));
+			if (outFilter != null) {
+				filter.append("(").append(outFilter).append(")");
+			}
+			args.add(filter.toString());
 		}
 
 		if (!obfuscate) {

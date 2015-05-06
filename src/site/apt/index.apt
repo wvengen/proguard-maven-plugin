@@ -31,6 +31,12 @@ proguard-maven-plugin
     <inFilter>!org/microemu/app/classloader/**</inFilter>
 ---
 
+    ** You can use <<<outFilter>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to output jar
+
+---
+    <outFilter>!**ECLIPSEF.*</outFilter>
+---
+
     ** <<<exclusions>>> allow fine grain filter for dependency if includeDependency is enabled
 
 ---
