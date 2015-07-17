@@ -20,6 +20,14 @@
  */
 package com.github.wvengen.maven.proguard;
 
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
@@ -34,10 +42,6 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
-
-import java.io.File;
-import java.net.URL;
-import java.util.*;
 
 /**
  *
@@ -244,6 +248,7 @@ public class ProGuardMojo extends AbstractMojo {
 	 */
 	private JarArchiver jarArchiver;
 
+	
 	/**
 	 * The maven archive configuration to use. only if assembly is used.
 	 *
@@ -265,6 +270,20 @@ public class ProGuardMojo extends AbstractMojo {
 	 */
 	protected String proguardMainClass = "proguard.ProGuard";
 
+	/**
+	 * Sets the name of the ProGuard mapping file.
+	 *
+	 * @parameter default-value="proguard_map.txt"
+	 */
+	protected String mappingFileName = "proguard_map.txt";
+
+	/**
+	 * Sets the name of the ProGuard seed file.
+	 *
+	 * @parameter default-value="proguard_seed.txt"
+	 */
+	protected String seedFileName = "proguard_seeds.txt";
+	
 	private Log log;
 
 	/**
@@ -355,7 +374,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if (log.isDebugEnabled()) {
 			@SuppressWarnings("unchecked")
-			List<Artifact> dependancy = (List<Artifact>) mavenProject.getCompileArtifacts();
+			List<Artifact> dependancy = mavenProject.getCompileArtifacts();
 			for (Iterator<Artifact> i = dependancy.iterator(); i.hasNext();) {
 				Artifact artifact =  i.next();
 				log.debug("--- compile artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
@@ -489,10 +508,10 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 
 		args.add("-printmapping");
-		args.add(fileToString((new File(outputDirectory, "proguard_map.txt").getAbsoluteFile())));
+		args.add(fileToString((new File(outputDirectory, mappingFileName).getAbsoluteFile())));
 
 		args.add("-printseeds");
-		args.add(fileToString((new File(outputDirectory, "proguard_seeds.txt").getAbsoluteFile())));
+		args.add(fileToString((new File(outputDirectory,seedFileName).getAbsoluteFile())));
 
 		if (log.isDebugEnabled()) {
 			args.add("-verbose");
