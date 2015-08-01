@@ -92,11 +92,11 @@ proguard-maven-plugin
 
         * <<<-dontobfuscate>>> When obfuscate is false
 
-        * <<<-libraryjars>>> Are created base on <<<libs>>> and your project dependencies when includeDependency is true (by default).
+        * <<<-libraryjars>>> Are created based on <<<libs>>> and your project dependencies when includeDependency is true (by default).
 
         * <<<-verbose>>>  When executing <<<maven -X>>>
 
-        * <<<-printmapping>>> ${project.build.directory}/proguard_map.txt and <<<-printseeds>>> ${project.build.directory}/proguard_seeds.txt
+        * <<<-printmapping>>> is based on the <<<mappingFileName>>> set in the configuration, defaults to '${project.build.directory}/<\<mappingFileName\>>', while <<<-printseeds>>> is based on <<<seedFileName>>> and defaults to '${project.build.directory}/<\<seedFileName\>>'
 
         []
 
