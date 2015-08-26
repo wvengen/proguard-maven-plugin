@@ -1,3 +1,4 @@
+sudo: false
 language: java
 after_success: ./.publish_site.sh
 env:
