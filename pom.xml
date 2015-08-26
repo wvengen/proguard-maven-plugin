@@ -12,7 +12,7 @@
 	<groupId>com.github.wvengen</groupId>
 	<artifactId>proguard-maven-plugin</artifactId>
 	<name>proguard-maven-plugin</name>
-	<version>2.0.11-SNAPSHOT</version>
+	<version>2.0.11</version>
 	<packaging>maven-plugin</packaging>
 
 	<description>Maven 2 Plugin for ProGuard</description>
