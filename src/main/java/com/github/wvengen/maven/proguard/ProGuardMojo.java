@@ -685,24 +685,26 @@ public class ProGuardMojo extends AbstractMojo {
 	}
 
 	private static boolean deleteFileOrDirectory(File path) throws MojoFailureException {
-        if (path.isDirectory()) {
-            File[] files = path.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    if (!deleteFileOrDirectory(files[i])) {
-                        throw new MojoFailureException("Can't delete dir " + files[i]);
-                    }
-                } else {
-                    if (!files[i].delete()) {
-                        throw new MojoFailureException("Can't delete file " + files[i]);
-                    }
-                }
-            }
-            return path.delete();
-        } else {
-            return path.delete();
-        }
-    }
+		if (path.isDirectory()) {
+			File[] files = path.listFiles();
+			if (null != files) {
+				for (File file : files) {
+					if (file.isDirectory()) {
+						if (!deleteFileOrDirectory(file)) {
+							throw new MojoFailureException("Can't delete dir " + file);
+						}
+					} else {
+						if (!file.delete()) {
+							throw new MojoFailureException("Can't delete file " + file);
+						}
+					}
+				}
+			}
+			return path.delete();
+		} else {
+			return path.delete();
+		}
+	}
 
 
 	private static Artifact getDependancy(Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
