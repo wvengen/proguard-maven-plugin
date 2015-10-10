@@ -6,6 +6,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<label>NO_LABEL</label>
+		<cctimestamp>NO_TIMESTAMP</cctimestamp>
+		<scm.revision>NO_SCM_REVISION</scm.revision>
 	</properties>
 
 
@@ -16,17 +19,17 @@
 	<packaging>maven-plugin</packaging>
 
 	<description>Maven 2 Plugin for ProGuard</description>
-	<url>http://github.com/wvengen/proguard-maven-plugin</url>
+	<url>https://github.com/wvengen/proguard-maven-plugin</url>
 
 	<licenses>
 		<license>
 			<name>GNU Lesser General Public License (LGPL)</name>
-			<url>http://www.gnu.org/licenses/lgpl.html</url>
+			<url>https://www.gnu.org/licenses/lgpl.html</url>
 		</license>
 	</licenses>
 
 	<scm>
-		<url>http://github.com/wvengen/proguard-maven-plugin</url>
+		<url>https://github.com/wvengen/proguard-maven-plugin</url>
 		<connection>scm:git:git://github.com/wvengen/proguard-maven-plugin.git</connection>
 	</scm>
 
@@ -88,7 +91,7 @@
 
 	<build>
 		<plugins>
-		
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -132,6 +135,21 @@
 				<configuration>
 					<outputEncoding>UTF-8</outputEncoding>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>
