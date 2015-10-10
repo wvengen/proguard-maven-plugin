@@ -574,10 +574,13 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 
 		if (attach && !sameArtifact) {
+			final String classifier;
 			if (useArtifactClassifier()) {
-				projectHelper.attachArtifact(mavenProject, attachArtifactType, attachArtifactClassifier, outJarFile);
+				classifier = attachArtifactClassifier;
 			} else {
-				projectHelper.attachArtifact(mavenProject, attachArtifactType, null, outJarFile);
+				classifier = null;
+			}
+			projectHelper.attachArtifact(mavenProject, attachArtifactType, classifier, outJarFile);
 			}
 		}
 	}
