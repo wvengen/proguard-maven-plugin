@@ -181,6 +181,20 @@ public class ProGuardMojo extends AbstractMojo {
 	private boolean attach;
 
 	/**
+	 * Determines if {@link #attach} also attaches the {@link #mappingFileName} file.
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean attachMap;
+
+	/**
+	 * Determines if {@link #attach} also attaches the {@link #seedFileName} file.
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean attachSeed;
+
+	/**
 	 * Specifies attach artifact type
 	 *
 	 * @parameter default-value="jar"
@@ -581,7 +595,31 @@ public class ProGuardMojo extends AbstractMojo {
 				classifier = null;
 			}
 			projectHelper.attachArtifact(mavenProject, attachArtifactType, classifier, outJarFile);
+			final File buildOutput = new File(mavenProject.getBuild().getDirectory());
+			if (attachMap) {
+				log.info("Attempting to attach map artifact");
+				final String suffix = "map";
+				final String mapClassifier = (null == classifier ? "" : classifier+"-") + suffix;
+				attachTextFile(new File(buildOutput, mappingFileName), mapClassifier);
 			}
+			if (attachSeed) {
+				log.info("Attempting to attach seed artifact");
+				final String suffix = "seed";
+				final String seedClassifier = (null == classifier ? "" : classifier+"-" ) + suffix;
+				attachTextFile(new File(buildOutput, seedFileName), seedClassifier);
+			}
+		}
+	}
+
+	private void attachTextFile(File theFile, String classifier) {
+		if (theFile.exists()) {
+			if (theFile.isFile()) {
+				projectHelper.attachArtifact(mavenProject, "txt", classifier, theFile);
+			} else {
+				log.warn("Cannot attach file because it is not a file: "+theFile);
+			}
+		} else {
+			log.warn("Cannot attach file because it does not exist: "+theFile);
 		}
 	}
 
