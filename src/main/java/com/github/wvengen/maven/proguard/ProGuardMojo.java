@@ -21,6 +21,7 @@
 package com.github.wvengen.maven.proguard;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +43,7 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  *
@@ -100,6 +102,20 @@ public class ProGuardMojo extends AbstractMojo {
 	 * @parameter default-value="true"
 	 */
 	private boolean includeDependency;
+
+	/**
+	 * @parameter expression="${project.build.directory}/tempLibraryjars"
+	 * @readonly
+	 */
+	private File tempLibraryjarsDir;
+
+	/**
+	 * Specifies to copy all the -libraryjars dependencies into a temporary directory and pass that directory
+	 * as the only -libraryjars argument to ProGuard.
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean putLibraryJarsInTempDir;
 
 
 	/**
@@ -371,6 +387,7 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 
 		ArrayList<String> args = new ArrayList<String>();
+		ArrayList<File> libraryJars = new ArrayList<File>();
 
 		if (log.isDebugEnabled()) {
 			@SuppressWarnings("unchecked")
@@ -422,8 +439,12 @@ public class ProGuardMojo extends AbstractMojo {
 					// This may not be CompileArtifacts, maven 2.0.6 bug
 					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
 					inPath.add(file.toString());
-					args.add("-libraryjars");
-					args.add(fileToString(file));
+					if(putLibraryJarsInTempDir){
+						libraryJars.add(file);
+					} else {
+						args.add("-libraryjars");
+						args.add(fileToString(file));
+					}
 				}
 			}
 		}
@@ -470,12 +491,16 @@ public class ProGuardMojo extends AbstractMojo {
 				if (includeDependencyInjar) {
 					log.debug("--- ADD library as injars:" + artifact.getArtifactId());
 					args.add("-injars");
+					args.add(fileToString(file));
 				} else {
 					log.debug("--- ADD libraryjars:" + artifact.getArtifactId());
-					args.add("-libraryjars");
-
+					if (putLibraryJarsInTempDir) {
+						libraryJars.add(file);
+					} else {
+						args.add("-libraryjars");
+						args.add(fileToString(file));
+					}
 				}
-				args.add(fileToString(file));
 			}
 		}
 
@@ -504,9 +529,30 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if (libs != null) {
 			for (String lib : libs) {
-				args.add("-libraryjars");
-				args.add(fileNameToString(lib));
+				if (putLibraryJarsInTempDir) {
+					libraryJars.add(new File(lib.toString()));
+				} else {
+					args.add("-libraryjars");
+					args.add(fileNameToString(lib.toString()));
+				}
 			}
+		}
+
+		if (!libraryJars.isEmpty()) {
+			log.debug("Copy libraryJars to temporary directory");
+			log.debug("Temporary directory: " + tempLibraryjarsDir);
+			if (!tempLibraryjarsDir.mkdir()) {
+				throw new MojoFailureException("Can't create temporary libraryJars directory: " + tempLibraryjarsDir.getAbsolutePath());
+			}
+			for (File libraryJar : libraryJars) {
+				try {
+					FileUtils.copyFileToDirectory(libraryJar, tempLibraryjarsDir);
+				} catch (IOException e) {
+					throw new MojoFailureException("Can't copy to temporary libraryJars directory", e);
+				}
+			}
+			args.add("-libraryjars");
+			args.add(fileToString(tempLibraryjarsDir));
 		}
 
 		args.add("-printmapping");
@@ -525,6 +571,11 @@ public class ProGuardMojo extends AbstractMojo {
 
 		log.info("execute ProGuard " + args.toString());
 		proguardMain(getProguardJar(this), args, this);
+
+
+		if (!libraryJars.isEmpty()) {
+			deleteFileOrDirectory(tempLibraryjarsDir);
+		}
 
 		if ((assembly != null) && (hasInclusionLibrary)) {
 

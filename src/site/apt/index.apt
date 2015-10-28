@@ -103,6 +103,12 @@ proguard-maven-plugin
     Additional ProGuard configuration can be added using {{{proguard-mojo.html#options}options}} or {{{proguard-mojo.html#proguardInclude}proguardInclude}}
 
 
+    ** Command line length workaround
+
+        If you have a huge list of dependencies the list of <<<-libraryjars>>> the resulting command line to execute ProGaurd could become too long. On Windows the error message could look like <<<CreateProcess error=206, The filename or extension is too long>>>.
+
+        * <<< <putLibraryJarsInTempDir>true</putLibraryJarsInTempDir> >>> makes the plugin copy all the library jars to a single temporary directory and pass that directory as the only <<<-libraryjars>>> argument to ProGuard. Build performance will be a bit worse, but the command line will be much shorter.
+
 
 * Usage
 
