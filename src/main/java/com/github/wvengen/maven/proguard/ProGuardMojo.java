@@ -544,10 +544,10 @@ public class ProGuardMojo extends AbstractMojo {
 		if (libs != null) {
 			for (String lib : libs) {
 				if (putLibraryJarsInTempDir) {
-					libraryJars.add(new File(lib.toString()));
+					libraryJars.add(new File(lib));
 				} else {
 					args.add("-libraryjars");
-					args.add(fileNameToString(lib.toString()));
+					args.add(fileNameToString(lib));
 				}
 			}
 		}
