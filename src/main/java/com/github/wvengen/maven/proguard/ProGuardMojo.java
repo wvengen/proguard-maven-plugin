@@ -81,12 +81,12 @@ public class ProGuardMojo extends AbstractMojo {
 	 */
 	private String proguardVersion;
 
-    /**
-     * To run DexGuard instead of ProGuard, set this to "true".
-     *
-     * @parameter default-value="false"
-     */
-    private boolean useDexGuard;
+	/**
+	 * To run DexGuard instead of ProGuard, set this to "true".
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean useDexGuard;
 
 	/**
 	 * ProGuard configuration options
@@ -327,11 +327,11 @@ public class ProGuardMojo extends AbstractMojo {
 	 * ProGuard docs: Names with special characters like spaces and parentheses must be quoted with single or double
 	 * quotes.
 	 */
-	private static String fileNameToString(String fileName) {
+	private String fileNameToString(String fileName) {
 		return "'" + fileName + "'";
 	}
 
-	private static String fileToString(File file) {
+	private String fileToString(File file) {
 		return fileNameToString(file.toString());
 	}
 
@@ -680,7 +680,7 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 	}
 
-	private static File getProguardJar(ProGuardMojo mojo) throws MojoExecutionException {
+	private File getProguardJar(ProGuardMojo mojo) throws MojoExecutionException {
 
 		Artifact proguardArtifact = null;
 		int proguardArtifactDistance = -1;
@@ -729,7 +729,7 @@ public class ProGuardMojo extends AbstractMojo {
 		return new File(proguardJar);
 	}
 
-	private static void proguardMain(File proguardJar, List<String> argsList, ProGuardMojo mojo)
+	private void proguardMain(File proguardJar, List<String> argsList, ProGuardMojo mojo)
 			throws MojoExecutionException {
 
 		Java java = new Java();
@@ -774,7 +774,7 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 	}
 
-	private static String nameNoType(String fileName) {
+	private String nameNoType(String fileName) {
 		int extStart = fileName.lastIndexOf('.');
 		if (extStart == -1) {
 			return fileName;
@@ -782,7 +782,7 @@ public class ProGuardMojo extends AbstractMojo {
 		return fileName.substring(0, extStart);
 	}
 
-	private static boolean deleteFileOrDirectory(File path) throws MojoFailureException {
+	private boolean deleteFileOrDirectory(File path) throws MojoFailureException {
 		if (path.isDirectory()) {
 			File[] files = path.listFiles();
 			if (null != files) {
@@ -805,7 +805,7 @@ public class ProGuardMojo extends AbstractMojo {
 	}
 
 
-	private static Artifact getDependency(Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
+	private Artifact getDependency(Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
 		@SuppressWarnings("unchecked")
 		Set<Artifact> dependency = mavenProject.getArtifacts();
 		for (Artifact artifact : dependency) {
@@ -828,7 +828,7 @@ public class ProGuardMojo extends AbstractMojo {
 		return false;
 	}
 
-	private static File getClasspathElement(Artifact artifact, MavenProject mavenProject) throws MojoExecutionException {
+	private File getClasspathElement(Artifact artifact, MavenProject mavenProject) throws MojoExecutionException {
 		if (artifact.getClassifier() != null) {
 			return artifact.getFile();
 		}
