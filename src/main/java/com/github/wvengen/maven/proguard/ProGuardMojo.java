@@ -314,6 +314,13 @@ public class ProGuardMojo extends AbstractMojo {
 	 */
 	protected String seedFileName = "proguard_seeds.txt";
 
+	/**
+	 * If the plugin should be silent.
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean silent;
+
 	private Log log;
 
 	/**
@@ -722,7 +729,7 @@ public class ProGuardMojo extends AbstractMojo {
 		return new File(proguardJar);
 	}
 
-	private static void proguardMain(File proguardJar, List<String> argsList, ProGuardMojo mojo)
+	private void proguardMain(File proguardJar, List<String> argsList, ProGuardMojo mojo)
 			throws MojoExecutionException {
 
 		Java java = new Java();
@@ -734,7 +741,8 @@ public class ProGuardMojo extends AbstractMojo {
 		DefaultLogger antLogger = new DefaultLogger();
 		antLogger.setOutputPrintStream(System.out);
 		antLogger.setErrorPrintStream(System.err);
-		antLogger.setMessageOutputLevel(mojo.log.isDebugEnabled() ? Project.MSG_DEBUG : Project.MSG_INFO);
+		int logLevel = mojo.log.isDebugEnabled() ? Project.MSG_DEBUG : Project.MSG_INFO;
+		antLogger.setMessageOutputLevel(silent ? Project.MSG_ERR : logLevel);
 
 		antProject.addBuildListener(antLogger);
 		antProject.setBaseDir(mojo.mavenProject.getBasedir());
