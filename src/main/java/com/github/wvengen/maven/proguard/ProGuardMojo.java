@@ -322,6 +322,14 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String seedFileName = "proguard_seeds.txt";
 
 	/**
+	 * The proguard jar to use. useful for using beta versions of
+	 * progaurd that aren't yet on Maven central.
+	 *
+	 * @parameter
+	 */
+	protected File proguardJar;
+
+	/**
 	 * If the plugin should be silent.
 	 *
 	 * @parameter default-value="false"
@@ -688,6 +696,20 @@ public class ProGuardMojo extends AbstractMojo {
 	}
 
 	private File getProguardJar(ProGuardMojo mojo) throws MojoExecutionException {
+
+		if (proguardJar != null) {
+			if (proguardJar.exists()) {
+				if (proguardJar.isFile()) {
+					return proguardJar;
+				} else {
+					mojo.getLog().warn("proguard jar (" + proguardJar + ") is not a file");
+					throw new MojoExecutionException("proguard jar (" + proguardJar + ") is not a file");
+				}
+			} else {
+				mojo.getLog().warn("proguard jar (" + proguardJar + ") does not exist");
+				throw new MojoExecutionException("proguard jar (" + proguardJar + ") does not exist");
+			}
+		}
 
 		Artifact proguardArtifact = null;
 		int proguardArtifactDistance = -1;
