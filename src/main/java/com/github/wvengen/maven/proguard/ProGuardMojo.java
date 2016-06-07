@@ -577,7 +577,8 @@ public class ProGuardMojo extends AbstractMojo {
 		if (!libraryJars.isEmpty()) {
 			log.debug("Copy libraryJars to temporary directory");
 			log.debug("Temporary directory: " + tempLibraryjarsDir);
-			if (!tempLibraryjarsDir.mkdir()) {
+            tempLibraryjarsDir.mkdir();
+			if (!tempLibraryjarsDir.exists()) {
 				throw new MojoFailureException("Can't create temporary libraryJars directory: " + tempLibraryjarsDir.getAbsolutePath());
 			}
 			for (File libraryJar : libraryJars) {
