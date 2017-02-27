@@ -31,6 +31,12 @@ proguard-maven-plugin
     <inFilter>!org/microemu/app/classloader/**</inFilter>
 ---
 
+    ** You can use <<<outFilter>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to output jar
+
+---
+    <outFilter>!**ECLIPSEF.*</outFilter>
+---
+
     ** <<<exclusions>>> allow fine grain filter for dependency if includeDependency is enabled
 
 ---
@@ -86,16 +92,22 @@ proguard-maven-plugin
 
         * <<<-dontobfuscate>>> When obfuscate is false
 
-        * <<<-libraryjars>>> Are created base on <<<libs>>> and your project dependencies when includeDependency is true (by default).
+        * <<<-libraryjars>>> Are created based on <<<libs>>> and your project dependencies when includeDependency is true (by default).
 
         * <<<-verbose>>>  When executing <<<maven -X>>>
 
-        * <<<-printmapping>>> ${project.build.directory}/proguard_map.txt and <<<-printseeds>>> ${project.build.directory}/proguard_seeds.txt
+        * <<<-printmapping>>> is based on the <<<mappingFileName>>> set in the configuration, defaults to '${project.build.directory}/<\<mappingFileName\>>', while <<<-printseeds>>> is based on <<<seedFileName>>> and defaults to '${project.build.directory}/<\<seedFileName\>>'
 
         []
 
     Additional ProGuard configuration can be added using {{{proguard-mojo.html#options}options}} or {{{proguard-mojo.html#proguardInclude}proguardInclude}}
 
+
+    ** Command line length workaround
+
+        If you have a huge list of dependencies the list of <<<-libraryjars>>> the resulting command line to execute ProGaurd could become too long. On Windows the error message could look like <<<CreateProcess error=206, The filename or extension is too long>>>.
+
+        * <<< <putLibraryJarsInTempDir>true</putLibraryJarsInTempDir> >>> makes the plugin copy all the library jars to a single temporary directory and pass that directory as the only <<<-libraryjars>>> argument to ProGuard. Build performance will be a bit worse, but the command line will be much shorter.
 
 
 * Usage
