@@ -807,14 +807,17 @@ public class ProGuardMojo extends AbstractMojo {
 			outJarFile = outputWar;
 		}
 
-		if (attach && !sameArtifact) {
-			final String classifier;
-			if (useArtifactClassifier()) {
-				classifier = attachArtifactClassifier;
-			} else {
-				classifier = null;
+		if (attach) {
+			if (!sameArtifact) {
+				final String classifier;
+				if (useArtifactClassifier()) {
+					classifier = attachArtifactClassifier;
+				} else {
+					classifier = null;
+				}
+
+				projectHelper.attachArtifact(mavenProject, attachArtifactType, classifier, outJarFile);
 			}
-			projectHelper.attachArtifact(mavenProject, attachArtifactType, classifier, outJarFile);
 
 			final String mainClassifier = useArtifactClassifier() ? attachArtifactClassifier : null;
 			final File buildOutput = new File(mavenProject.getBuild().getDirectory());
