@@ -357,8 +357,13 @@ public class ProGuardMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
 		log = getLog();
-
-		if (skip) {
+                boolean jvmSkipProperty = false;
+                try {
+                    jvmSkipProperty = Boolean.valueOf(System.getProperty("proguard.skip"));
+                } catch (Exception e) {
+                    log.warn("Invalid -Dproguard.skip value.");
+                }
+		if (skip || jvmSkipProperty) {
 			log.info("Bypass ProGuard processing because \"proguard.skip=true\"");
 			return;
 		}
