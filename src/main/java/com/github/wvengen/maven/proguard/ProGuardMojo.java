@@ -60,7 +60,13 @@ import org.codehaus.plexus.util.FileUtils;
 
 public class ProGuardMojo extends AbstractMojo {
 
-	/**
+    /**
+     * Proguard doesn't support Java 9. It can hower work with multi version jars
+     * we just need to ignore the higher versions.
+     */
+	private static final String MULTI_VERSION_JAR_EXCLUSION = "(!META-INF/versions/**)";
+
+    /**
 	 * Set this to 'true' to bypass ProGuard processing entirely.
 	 *
 	 * @parameter property="proguard.skip"
@@ -475,12 +481,7 @@ public class ProGuardMojo extends AbstractMojo {
 					// This may not be CompileArtifacts, maven 2.0.6 bug
 					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
 					inPath.add(file.toString());
-					if(putLibraryJarsInTempDir){
-						libraryJars.add(file);
-					} else {
-						args.add("-libraryjars");
-						args.add(fileToString(file));
-					}
+					addLibraryJar(args, libraryJars, file);
 				}
 			}
 		}
@@ -530,12 +531,7 @@ public class ProGuardMojo extends AbstractMojo {
 					args.add(fileToString(file));
 				} else {
 					log.debug("--- ADD libraryjars:" + artifact.getArtifactId());
-					if (putLibraryJarsInTempDir) {
-						libraryJars.add(file);
-					} else {
-						args.add("-libraryjars");
-						args.add(fileToString(file));
-					}
+					addLibraryJar(args, libraryJars, file);
 				}
 			}
 		}
@@ -565,12 +561,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if (libs != null) {
 			for (String lib : libs) {
-				if (putLibraryJarsInTempDir) {
-					libraryJars.add(new File(lib));
-				} else {
-					args.add("-libraryjars");
-					args.add(fileNameToString(lib));
-				}
+                addLibraryJar(args, libraryJars, new File(lib));
 			}
 		}
 
@@ -690,6 +681,17 @@ public class ProGuardMojo extends AbstractMojo {
 			}
 		}
 	}
+
+    private void addLibraryJar(ArrayList<String> args, ArrayList<File> libraryJars, File file)
+    {
+        if (putLibraryJarsInTempDir) {
+            libraryJars.add(file);
+        } else {
+            args.add("-libraryjars");
+        	    args.add(fileToString(file));
+        	    args.add(MULTI_VERSION_JAR_EXCLUSION);
+        }
+    }
 
 	private void attachTextFile(File theFile, String mainClassifier, String suffix) {
 		final String classifier = (null == mainClassifier ? "" : mainClassifier+"-") + suffix;
