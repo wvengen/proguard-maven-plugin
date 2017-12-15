@@ -60,7 +60,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 public class ProGuardMojo extends AbstractMojo {
 
-	/**
+    /**
 	 * Set this to 'true' to bypass ProGuard processing entirely.
 	 *
 	 * @parameter property="proguard.skip"
@@ -123,7 +123,13 @@ public class ProGuardMojo extends AbstractMojo {
 	 * @parameter default-value="false"
 	 */
 	private boolean putLibraryJarsInTempDir;
-
+	
+	/**
+     * Sets an exclude for all library jars, eg: (!META-INF/versions/**)
+     *
+     * @parameter default-value=""
+     */
+    private String libraryJarExclusion;
 
 	/**
 	 * Specifies that project compile dependencies should be added as injar.
@@ -475,12 +481,7 @@ public class ProGuardMojo extends AbstractMojo {
 					// This may not be CompileArtifacts, maven 2.0.6 bug
 					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
 					inPath.add(file.toString());
-					if(putLibraryJarsInTempDir){
-						libraryJars.add(file);
-					} else {
-						args.add("-libraryjars");
-						args.add(fileToString(file));
-					}
+					addLibraryJar(args, libraryJars, file);
 				}
 			}
 		}
@@ -530,12 +531,7 @@ public class ProGuardMojo extends AbstractMojo {
 					args.add(fileToString(file));
 				} else {
 					log.debug("--- ADD libraryjars:" + artifact.getArtifactId());
-					if (putLibraryJarsInTempDir) {
-						libraryJars.add(file);
-					} else {
-						args.add("-libraryjars");
-						args.add(fileToString(file));
-					}
+					addLibraryJar(args, libraryJars, file);
 				}
 			}
 		}
@@ -565,12 +561,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if (libs != null) {
 			for (String lib : libs) {
-				if (putLibraryJarsInTempDir) {
-					libraryJars.add(new File(lib));
-				} else {
-					args.add("-libraryjars");
-					args.add(fileNameToString(lib));
-				}
+                addLibraryJar(args, libraryJars, new File(lib));
 			}
 		}
 
@@ -690,6 +681,19 @@ public class ProGuardMojo extends AbstractMojo {
 			}
 		}
 	}
+
+    private void addLibraryJar(ArrayList<String> args, ArrayList<File> libraryJars, File file)
+    {
+        if (putLibraryJarsInTempDir) {
+            libraryJars.add(file);
+        } else {
+            args.add("-libraryjars");
+        	    args.add(fileToString(file));
+        	    if (libraryJarExclusion != null) {
+        	        args.add(libraryJarExclusion);
+        	    }
+        }
+    }
 
 	private void attachTextFile(File theFile, String mainClassifier, String suffix) {
 		final String classifier = (null == mainClassifier ? "" : mainClassifier+"-") + suffix;
