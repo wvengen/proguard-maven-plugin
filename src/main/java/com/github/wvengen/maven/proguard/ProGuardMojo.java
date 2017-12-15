@@ -61,12 +61,6 @@ import org.codehaus.plexus.util.FileUtils;
 public class ProGuardMojo extends AbstractMojo {
 
     /**
-     * Proguard doesn't support Java 9. It can hower work with multi version jars
-     * we just need to ignore the higher versions.
-     */
-	private static final String MULTI_VERSION_JAR_EXCLUSION = "(!META-INF/versions/**)";
-
-    /**
 	 * Set this to 'true' to bypass ProGuard processing entirely.
 	 *
 	 * @parameter property="proguard.skip"
@@ -129,7 +123,13 @@ public class ProGuardMojo extends AbstractMojo {
 	 * @parameter default-value="false"
 	 */
 	private boolean putLibraryJarsInTempDir;
-
+	
+	/**
+     * Sets an exclude for all library jars, eg: (!META-INF/versions/**)
+     *
+     * @parameter default-value=""
+     */
+    private String libraryJarExclusion;
 
 	/**
 	 * Specifies that project compile dependencies should be added as injar.
@@ -689,7 +689,9 @@ public class ProGuardMojo extends AbstractMojo {
         } else {
             args.add("-libraryjars");
         	    args.add(fileToString(file));
-        	    args.add(MULTI_VERSION_JAR_EXCLUSION);
+        	    if (libraryJarExclusion != null) {
+        	        args.add(libraryJarExclusion);
+        	    }
         }
     }
 
