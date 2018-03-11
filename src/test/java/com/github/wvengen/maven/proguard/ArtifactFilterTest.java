@@ -50,13 +50,46 @@ public class ArtifactFilterTest {
     }
 
     @Test
+    public void wildcardNoMatch_escapeArtifactDots() {
+        artifactFilter.groupId = "com.mahifx";
+        artifactFilter.artifactId = "li.b";
+        Assert.assertFalse(artifactFilter.match(getArtifact("com.mahifx", "liTb")));
+    }
+
+    @Test
     public void noMatchWithRegexTokens() {
         artifactFilter.groupId = "com.mahifx";
         artifactFilter.artifactId = "libB-utils";
         Assert.assertFalse(artifactFilter.match(getArtifact()));
     }
 
+    @Test
+    public void wildcardMatch_partOfGroupId() {
+        artifactFilter.groupId = "com.ma*";
+        artifactFilter.artifactId = "libA";
+        Assert.assertTrue(artifactFilter.match(getArtifact()));
+    }
+
+    @Test
+    public void simpleMatch() {
+        artifactFilter.groupId = "com.mahifx";
+        artifactFilter.artifactId = "libA";
+        Assert.assertTrue(artifactFilter.match(getArtifact()));
+    }
+
+    @Test
+    public void wildcardMatch_subGroup() {
+        artifactFilter.groupId = "com.mahifx.*";
+        artifactFilter.artifactId = "libA";
+        Assert.assertTrue(artifactFilter.match(getArtifact("com.mahifx.subgroup", "libA")));
+        Assert.assertTrue(artifactFilter.match(getArtifact("com.mahifx.subgroup.subsubgroup", "libA")));
+    }
+
     private DefaultArtifact getArtifact() {
-        return new DefaultArtifact("com.mahifx", "libA", VersionRange.createFromVersion("1.0.0"), "compile", "jar", null, new DefaultArtifactHandler());
+        return getArtifact("com.mahifx", "libA");
+    }
+    
+    private DefaultArtifact getArtifact(String groupId, String artifactId) {
+        return new DefaultArtifact(groupId, artifactId, VersionRange.createFromVersion("1.0.0"), "compile", "jar", null, new DefaultArtifactHandler());
     }
 }
