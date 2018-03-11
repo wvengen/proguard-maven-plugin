@@ -25,8 +25,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.archiver.MavenArchiveConfiguration;
@@ -448,39 +451,55 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 
 		Set<String> inPath = new HashSet<String>();
+		Map<Artifact, Inclusion> injars = new HashMap<Artifact, Inclusion>();
+		Map<Artifact, Inclusion> libraryjars = new HashMap<Artifact, Inclusion>();
 		boolean hasInclusionLibrary = false;
 		if (assembly != null && assembly.inclusions != null) {
 			@SuppressWarnings("unchecked")
 			final List<Inclusion> inclusions = assembly.inclusions;
 			for (Inclusion inc : inclusions) {
-				if (!inc.library) {
-					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
-					inPath.add(file.toString());
-					log.debug("--- ADD injars:" + inc.artifactId);
-					StringBuilder filter = new StringBuilder(fileToString(file));
-					filter.append("(!META-INF/MANIFEST.MF");
-					if (!addMavenDescriptor) {
-						filter.append(",");
-						filter.append("!META-INF/maven/**");
-					}
-					if (inc.filter != null) {
-						filter.append(",").append(inc.filter);
-					}
-					filter.append(")");
-					args.add("-injars");
-					args.add(filter.toString());
-				} else {
-					hasInclusionLibrary = true;
-					log.debug("--- ADD libraryjars:" + inc.artifactId);
-					// This may not be CompileArtifacts, maven 2.0.6 bug
-					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
-					inPath.add(file.toString());
-					if(putLibraryJarsInTempDir){
-						libraryJars.add(file);
+				for (Artifact artifact : getDependencies(inc, mavenProject)) {
+					if (inc.library) {
+						if (!injars.containsKey(artifact)) {
+							libraryjars.put(artifact, inc);
+						}
 					} else {
-						args.add("-libraryjars");
-						args.add(fileToString(file));
+						injars.put(artifact, inc);
+						if (libraryjars.containsKey(artifact)) {
+							libraryjars.remove(artifact);
+						}
 					}
+				}
+			}
+
+			for (Entry<Artifact, Inclusion> entry : injars.entrySet()) {
+				log.info("--- ADD injars:" + entry.getKey().getArtifactId());
+				File file = getClasspathElement(entry.getKey(), mavenProject);
+				inPath.add(file.toString());
+				StringBuilder filter = new StringBuilder(fileToString(file));
+				filter.append("(!META-INF/MANIFEST.MF");
+				if (!addMavenDescriptor) {
+					filter.append(",");
+					filter.append("!META-INF/maven/**");
+				}
+				if (entry.getValue().filter != null) {
+					filter.append(",").append(entry.getValue().filter);
+				}
+				filter.append(")");
+				args.add("-injars");
+				args.add(filter.toString());
+			}
+
+			for (Entry<Artifact, Inclusion> entry : libraryjars.entrySet()) {
+				log.info("--- ADD libraryjars:" + entry.getKey().getArtifactId());
+				File file = getClasspathElement(entry.getKey(), mavenProject);
+				hasInclusionLibrary = true;
+				inPath.add(file.toString());
+				if (putLibraryJarsInTempDir) {
+					libraryJars.add(file);
+				} else {
+					args.add("-libraryjars");
+					args.add(fileToString(file));
 				}
 			}
 		}
