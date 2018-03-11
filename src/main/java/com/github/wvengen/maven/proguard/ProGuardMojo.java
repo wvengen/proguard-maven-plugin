@@ -860,18 +860,6 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 	}
 
-
-	private Artifact getDependency(Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
-		@SuppressWarnings("unchecked")
-		Set<Artifact> dependency = mavenProject.getArtifacts();
-		for (Artifact artifact : dependency) {
-			if (inc.match(artifact)) {
-				return artifact;
-			}
-		}
-		throw new MojoExecutionException("artifactId Not found " + inc.artifactId);
-	}
-
 	private Set<Artifact> getDependencies(final Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
 		@SuppressWarnings("unchecked")
 		Set<Artifact> dependencies = mavenProject.getArtifacts();
