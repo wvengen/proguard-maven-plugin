@@ -857,6 +857,21 @@ public class ProGuardMojo extends AbstractMojo {
 		throw new MojoExecutionException("artifactId Not found " + inc.artifactId);
 	}
 
+	private Set<Artifact> getDependencies(final Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
+		@SuppressWarnings("unchecked")
+		Set<Artifact> dependencies = mavenProject.getArtifacts();
+		Set<Artifact> result = new HashSet<Artifact>();
+		for (Artifact artifact : dependencies) {
+			if (inc.match(artifact)) {
+				result.add(artifact);
+			}
+		}
+		if (result.isEmpty()) {
+			log.warn(String.format("No artifact found : %s:%s", inc.artifactId, inc.groupId));
+		}
+		return result;
+	}
+
 	private boolean isExclusion(Artifact artifact) {
 		if (exclusions == null) {
 			return false;
