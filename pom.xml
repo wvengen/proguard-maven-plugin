@@ -51,6 +51,12 @@
 		</developer>
 	</developers>
 
+	<contributors>
+		<contributor>
+			<name>Chuckame</name>
+			<email>chuckame@gmail.com</email>
+		</contributor>
+	</contributors>
 
 	<dependencies>
 
