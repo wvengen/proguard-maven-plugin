@@ -662,20 +662,16 @@ public class ProGuardMojo extends AbstractMojo {
 
 			try {
 				jarArchiver.addArchivedFileSet(baseFile);
-				@SuppressWarnings("unchecked")
-				final List<Inclusion> inclusions = assembly.inclusions;
-				for (Inclusion inc : inclusions) {
-					if (inc.library) {
-						File file;
-						Artifact artifact = getDependency(inc, mavenProject);
-						file = getClasspathElement(artifact, mavenProject);
-						if (file.isDirectory()) {
-							getLog().info("merge project: " + artifact.getArtifactId() + " " + file);
-							jarArchiver.addDirectory(file);
-						} else {
-							getLog().info("merge artifact: " + artifact.getArtifactId());
-							jarArchiver.addArchivedFileSet(file);
-						}
+
+				for (Entry<Artifact, Inclusion> entry : libraryjars.entrySet()) {
+					File file;
+					file = getClasspathElement(entry.getKey(), mavenProject);
+					if (file.isDirectory()) {
+						getLog().info("merge project: " + entry.getKey() + " " + file);
+						jarArchiver.addDirectory(file);
+					} else {
+						getLog().info("merge artifact: " + entry.getKey());
+						jarArchiver.addArchivedFileSet(file);
 					}
 				}
 
