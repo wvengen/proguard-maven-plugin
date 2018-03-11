@@ -1,6 +1,7 @@
 package com.github.wvengen.maven.proguard;
 
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -26,10 +27,26 @@ public class ArtifactFilterTest {
     }
 
     @Test
-    public void wildcardMatch() {
+    public void wildcardMatch_allArtifact() {
         artifactFilter.groupId = "com.mahifx";
         artifactFilter.artifactId = "*";
         Assert.assertTrue(artifactFilter.match(getArtifact()));
+    }
+
+    @Test
+    public void wildcardMatch_partOfArtifact() {
+        artifactFilter.groupId = "com.mahifx";
+        artifactFilter.artifactId = "lib*";
+        Assert.assertTrue(artifactFilter.match(getArtifact()));
+    }
+
+    @Test
+    public void wildcardMatch_escapeArtifactDots() {
+        artifactFilter.groupId = "com.mahifx";
+        artifactFilter.artifactId = "li.*";
+        Artifact artifact = getArtifact();
+        artifact.setArtifactId("li.b");
+        Assert.assertTrue(artifactFilter.match(artifact));
     }
 
     @Test
@@ -38,28 +55,6 @@ public class ArtifactFilterTest {
         artifactFilter.artifactId = "libB-utils";
         Assert.assertFalse(artifactFilter.match(getArtifact()));
     }
-
-    @Test
-    public void regexMatch() {
-        artifactFilter.groupId = "com.mahifx";
-        artifactFilter.artifactId = "lib.*";
-        Assert.assertTrue(artifactFilter.match(getArtifact()));
-    }
-
-    @Test
-    public void regexNoMatch() {
-        artifactFilter.groupId = "com.mahifx";
-        artifactFilter.artifactId = "foo.+";
-        Assert.assertFalse(artifactFilter.match(getArtifact()));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidRegex() {
-        artifactFilter.groupId = "com.mahifx";
-        artifactFilter.artifactId = "+";
-        artifactFilter.match(getArtifact());
-    }
-
 
     private DefaultArtifact getArtifact() {
         return new DefaultArtifact("com.mahifx", "libA", VersionRange.createFromVersion("1.0.0"), "compile", "jar", null, new DefaultArtifactHandler());
