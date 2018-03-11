@@ -46,11 +46,22 @@ public class ArtifactFilter {
 
     private Matcher getMatcher(Artifact artifact) {
         try {
-            Pattern compile = Pattern.compile(artifactId);
+            Pattern compile = Pattern.compile(escapeRegex(this.artifactId));
             return compile.matcher(artifact.getArtifactId());
         } catch (PatternSyntaxException e) {
             throw new IllegalArgumentException("Invalid regex artifact filter: " + this, e);
         }
+    }
+
+    
+    /**
+     * Escape regex and keep wildcard.<br>
+     * {@link Pattern#quote(String)} method wrap string between '\Q' for starting ignoring and '\E' for ending ignoring,<br>
+     * so we don't want to escape wildcard.<br>
+     * 'myregexpart1*myregexpart2' becomes '\Qmyregexpart1\E.*\Qmyregexpart2\E'.
+     */
+    private String escapeRegex(String str) {
+    	return Pattern.quote(str).replace(WILDCARD, "\\E.*\\Q");
     }
 
     @Override
