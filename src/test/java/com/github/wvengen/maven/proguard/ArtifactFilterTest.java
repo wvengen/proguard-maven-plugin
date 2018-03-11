@@ -12,17 +12,24 @@ public class ArtifactFilterTest {
     private ArtifactFilter artifactFilter = new ArtifactFilter();
 
     @Test
-    public void wildcardMatch() {
-        artifactFilter.groupId = "com.mahifx";
-        artifactFilter.artifactId = "*";
-        Assert.assertTrue(artifactFilter.match(getArtifact()));
-    }
-
-    @Test
     public void noMatch() {
         artifactFilter.groupId = "com.mahifx";
         artifactFilter.artifactId = "libB";
         Assert.assertFalse(artifactFilter.match(getArtifact()));
+    }
+
+    @Test
+    public void emptyArtifactDoesNotMatch() {
+        artifactFilter.groupId = "com.mahifx";
+        artifactFilter.artifactId = "";
+        Assert.assertFalse(artifactFilter.match(getArtifact()));
+    }
+
+    @Test
+    public void wildcardMatch() {
+        artifactFilter.groupId = "com.mahifx";
+        artifactFilter.artifactId = "*";
+        Assert.assertTrue(artifactFilter.match(getArtifact()));
     }
 
     @Test
@@ -43,13 +50,6 @@ public class ArtifactFilterTest {
     public void regexNoMatch() {
         artifactFilter.groupId = "com.mahifx";
         artifactFilter.artifactId = "foo.+";
-        Assert.assertFalse(artifactFilter.match(getArtifact()));
-    }
-
-    @Test
-    public void emptyArtifactDoesNotMatch() {
-        artifactFilter.groupId = "com.mahifx";
-        artifactFilter.artifactId = "";
         Assert.assertFalse(artifactFilter.match(getArtifact()));
     }
 
