@@ -21,6 +21,8 @@
 package com.github.wvengen.maven.proguard;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  *
@@ -329,6 +332,15 @@ public class ProGuardMojo extends AbstractMojo {
 	protected File applyMappingFile;
 
 	/**
+	 * Specifies whether or not to enable <a href=
+	 * "https://www.guardsquare.com/en/proguard/manual/examples#incremental">
+	 * incremental obfuscation</a>
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean incremental;
+
+	/**
 	 * The proguard jar to use. useful for using beta versions of
 	 * progaurd that aren't yet on Maven central.
 	 *
@@ -606,13 +618,18 @@ public class ProGuardMojo extends AbstractMojo {
 			args.add(fileToString(tempLibraryjarsDir));
 		}
 
+		File mappingFile = new File(outputDirectory, mappingFileName);
 		args.add("-printmapping");
-		args.add(fileToString((new File(outputDirectory, mappingFileName).getAbsoluteFile())));
+		args.add(fileToString(mappingFile.getAbsoluteFile()));
 
 		args.add("-printseeds");
 		args.add(fileToString((new File(outputDirectory,seedFileName).getAbsoluteFile())));
 
-		if (applyMappingFile != null) {
+		if (incremental && applyMappingFile == null) {
+			throw new MojoFailureException("applyMappingFile is required if incremental is true");
+		}
+
+		if (applyMappingFile != null && (!incremental || applyMappingFile.exists())) {
 			args.add("-applymapping");
 			args.add(fileToString(applyMappingFile.getAbsoluteFile()));
 		}
@@ -678,6 +695,27 @@ public class ProGuardMojo extends AbstractMojo {
 				throw new MojoExecutionException("Unable to create jar", e);
 			}
 
+		}
+
+		if (incremental) {
+			log.info("Merging mapping file into " + applyMappingFile);
+
+			try {
+				FileInputStream mappingFileIn = new FileInputStream(mappingFile);
+				try {
+					applyMappingFile.getParentFile().mkdirs();
+					FileOutputStream mappingFileOut = new FileOutputStream(applyMappingFile, true);
+					try {
+						IOUtil.copy(mappingFileIn, mappingFileOut);
+					} finally {
+						mappingFileOut.close();
+					}
+				} finally {
+					mappingFileIn.close();
+				}
+			} catch (IOException e) {
+				throw new MojoExecutionException("Unable to merge mapping file", e);
+			}
 		}
 
 		if (attach) {
