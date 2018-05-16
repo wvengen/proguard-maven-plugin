@@ -322,6 +322,13 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String seedFileName = "proguard_seeds.txt";
 
 	/**
+	 * Sets the name of the ProGuard applying mapping file.
+	 *
+	 * @parameter
+	 */
+	protected File applyMappingFile;
+
+	/**
 	 * The proguard jar to use. useful for using beta versions of
 	 * progaurd that aren't yet on Maven central.
 	 *
@@ -604,6 +611,11 @@ public class ProGuardMojo extends AbstractMojo {
 
 		args.add("-printseeds");
 		args.add(fileToString((new File(outputDirectory,seedFileName).getAbsoluteFile())));
+
+		if (applyMappingFile != null) {
+			args.add("-applymapping");
+			args.add(fileToString(applyMappingFile.getAbsoluteFile()));
+		}
 
 		if (log.isDebugEnabled()) {
 			args.add("-verbose");
