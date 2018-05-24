@@ -873,8 +873,12 @@ public class ProGuardMojo extends AbstractMojo {
 		if (artifact.getClassifier() != null) {
 			return artifact.getFile();
 		}
-		String refId = artifact.getGroupId() + ":" + artifact.getArtifactId();
+		String refId = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
 		MavenProject project = (MavenProject) mavenProject.getProjectReferences().get(refId);
+		if (project == null) {
+			refId = artifact.getGroupId() + ":" + artifact.getArtifactId();
+			project = (MavenProject) mavenProject.getProjectReferences().get(refId);
+		}
 		if (project != null) {
 			return new File(project.getBuild().getOutputDirectory());
 		} else {
