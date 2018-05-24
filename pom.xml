@@ -35,7 +35,7 @@
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/wvengen/proguard-maven-plugin/issues</url>
+		<url>https://github.com/radomirml/proguard-maven-plugin/issues</url>
 	</issueManagement>
 
 	<developers>
@@ -48,6 +48,11 @@
 			<id>cmorty</id>
 			<name>cmorty</name>
 			<email>morty@gmx.net</email>
+		</developer>
+		<developer>
+			<id>radomirml</id>
+			<name>radomirml</name>
+			<email>radomirml@gmail.com</email>
 		</developer>
 	</developers>
 
@@ -85,6 +90,12 @@
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 			<version>3.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>1.5.15</version>
 		</dependency>
 
 	</dependencies>
