@@ -453,33 +453,32 @@ public class ProGuardMojo extends AbstractMojo {
 			@SuppressWarnings("unchecked")
 			final List<Inclusion> inclusions = assembly.inclusions;
 			for (Inclusion inc : inclusions) {
+                File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
+                StringBuilder filter = new StringBuilder(fileToString(file));
+                filter.append("(!META-INF/MANIFEST.MF");
+                if (!addMavenDescriptor) {
+                    filter.append(",");
+                    filter.append("!META-INF/maven/**");
+                }
+                if (inc.filter != null) {
+                    filter.append(",").append(inc.filter);
+                }
+                filter.append(")");
 				if (!inc.library) {
-					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
 					inPath.add(file.toString());
 					log.debug("--- ADD injars:" + inc.artifactId);
-					StringBuilder filter = new StringBuilder(fileToString(file));
-					filter.append("(!META-INF/MANIFEST.MF");
-					if (!addMavenDescriptor) {
-						filter.append(",");
-						filter.append("!META-INF/maven/**");
-					}
-					if (inc.filter != null) {
-						filter.append(",").append(inc.filter);
-					}
-					filter.append(")");
 					args.add("-injars");
 					args.add(filter.toString());
 				} else {
 					hasInclusionLibrary = true;
 					log.debug("--- ADD libraryjars:" + inc.artifactId);
 					// This may not be CompileArtifacts, maven 2.0.6 bug
-					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
 					inPath.add(file.toString());
 					if(putLibraryJarsInTempDir){
 						libraryJars.add(file);
 					} else {
 						args.add("-libraryjars");
-						args.add(fileToString(file));
+                        args.add(filter.toString());
 					}
 				}
 			}
