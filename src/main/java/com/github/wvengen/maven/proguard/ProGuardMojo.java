@@ -450,9 +450,7 @@ public class ProGuardMojo extends AbstractMojo {
 		Set<String> inPath = new HashSet<String>();
 		boolean hasInclusionLibrary = false;
 		if (assembly != null && assembly.inclusions != null) {
-			@SuppressWarnings("unchecked")
-			final List<Inclusion> inclusions = assembly.inclusions;
-			for (Inclusion inc : inclusions) {
+			for (Inclusion inc : assembly.inclusions) {
                 File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
                 StringBuilder filter = new StringBuilder(fileToString(file));
                 filter.append("(!META-INF/MANIFEST.MF");
@@ -642,9 +640,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 			try {
 				jarArchiver.addArchivedFileSet(baseFile);
-				@SuppressWarnings("unchecked")
-				final List<Inclusion> inclusions = assembly.inclusions;
-				for (Inclusion inc : inclusions) {
+				for (Inclusion inc : assembly.inclusions) {
 					if (inc.library) {
 						File file;
 						Artifact artifact = getDependency(inc, mavenProject);
