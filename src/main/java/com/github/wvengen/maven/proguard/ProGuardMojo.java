@@ -455,9 +455,7 @@ public class ProGuardMojo extends AbstractMojo {
 		Map<Artifact, Inclusion> libraryjars = new HashMap<Artifact, Inclusion>();
 		boolean hasInclusionLibrary = false;
 		if (assembly != null && assembly.inclusions != null) {
-			@SuppressWarnings("unchecked")
-			final List<Inclusion> inclusions = assembly.inclusions;
-			for (Inclusion inc : inclusions) {
+			for (Inclusion inc : assembly.inclusions) {
 				for (Artifact artifact : getDependencies(inc, mavenProject)) {
 					if (inc.library) {
 						if (!injars.containsKey(artifact)) {
@@ -662,7 +660,6 @@ public class ProGuardMojo extends AbstractMojo {
 
 			try {
 				jarArchiver.addArchivedFileSet(baseFile);
-
 				for (Entry<Artifact, Inclusion> entry : libraryjars.entrySet()) {
 					File file;
 					file = getClasspathElement(entry.getKey(), mavenProject);
@@ -891,8 +888,12 @@ public class ProGuardMojo extends AbstractMojo {
 		if (artifact.getClassifier() != null) {
 			return artifact.getFile();
 		}
-		String refId = artifact.getGroupId() + ":" + artifact.getArtifactId();
+		String refId = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
 		MavenProject project = (MavenProject) mavenProject.getProjectReferences().get(refId);
+		if (project == null) {
+			refId = artifact.getGroupId() + ":" + artifact.getArtifactId();
+			project = (MavenProject) mavenProject.getProjectReferences().get(refId);
+		}
 		if (project != null) {
 			return new File(project.getBuild().getOutputDirectory());
 		} else {

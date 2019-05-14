@@ -24,6 +24,6 @@ import java.util.List;
 
 public class Assembly {
 
-	protected List inclusions;
+	protected List<Inclusion> inclusions;
 
 }
