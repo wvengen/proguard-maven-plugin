@@ -73,15 +73,26 @@ proguard-maven-plugin
             <inclusion>
                 <groupId>org.microemu</groupId><artifactId>microemu-javase-swing</artifactId>
             </inclusion>
+            <!-- groupId and artifactId support wildcards, including partial matching -->
+            <!-- include all org.thirdparty artifacts -->
+            <inclusion>
+                <groupId>org.thirdparty</groupId><artifactId>*</artifactId>
+            </inclusion>
         </inclusions>
         <exclusions>
-                <!-- artifactId supports wildcard for all artifacts or a regex for partial matching -->
-             <exclusion>
+            <!-- groupId and artifactId support wildcards, including partial matching -->
+            <!-- exclude all org.thirdparty1 artifacts -->
+            <exclusion>
                 <groupId>org.thirdparty1</groupId><artifactId>*</artifactId>
-             </exclusion>
-             <exclusion>
-                 <groupId>org.thirdparty2</groupId><artifactId>util.*</artifactId>
-             </exclusion>
+            </exclusion>
+            <!-- exclude all org.thirdparty2 artifacts beginning with 'util.' -->
+            <exclusion>
+                <groupId>org.thirdparty2</groupId><artifactId>util.*</artifactId>
+            </exclusion>
+            <!-- exclude all artifacts ending with '-macos' -->
+            <exclusion>
+                <groupId>*</groupId><artifactId>*-macos</artifactId>
+            </exclusion>
         </exclusions
     </assembly>
 ---
