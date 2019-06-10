@@ -60,6 +60,11 @@
 			<name>cmorty</name>
 			<email>morty@gmx.net</email>
 		</developer>
+		<developer>
+			<id>lasselindqvist</id>
+			<name>Lasse Lindqvist</name>
+			<email>lasse.k.lindqvist@gmail.com</email>
+		</developer>
 	</developers>
 
 	<contributors>
