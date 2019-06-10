@@ -118,15 +118,26 @@
             &lt;inclusion&gt;
                 &lt;groupId&gt;org.microemu&lt;/groupId&gt;&lt;artifactId&gt;microemu-javase-swing&lt;/artifactId&gt;
             &lt;/inclusion&gt;
+            &lt;!-- groupId and artifactId support wildcards, including partial matching --&gt;
+            &lt;!-- include all org.thirdparty artifacts --&gt;
+            &lt;inclusion&gt;
+                &lt;groupId&gt;org.thirdparty&lt;/groupId&gt;&lt;artifactId&gt;*&lt;/artifactId&gt;
+            &lt;/inclusion&gt;
         &lt;/inclusions&gt;
         &lt;exclusions&gt;
-                &lt;!-- artifactId supports wildcard for all artifacts or a regex for partial matching --&gt;
-             &lt;exclusion&gt;
+            &lt;!-- groupId and artifactId support wildcards, including partial matching --&gt;
+            &lt;!-- exclude all org.thirdparty1 artifacts --&gt;
+            &lt;exclusion&gt;
                 &lt;groupId&gt;org.thirdparty1&lt;/groupId&gt;&lt;artifactId&gt;*&lt;/artifactId&gt;
-             &lt;/exclusion&gt;
-             &lt;exclusion&gt;
-                 &lt;groupId&gt;org.thirdparty2&lt;/groupId&gt;&lt;artifactId&gt;util.*&lt;/artifactId&gt;
-             &lt;/exclusion&gt;
+            &lt;/exclusion&gt;
+            &lt;!-- exclude all org.thirdparty2 artifacts beginning with 'util.' --&gt;
+            &lt;exclusion&gt;
+                &lt;groupId&gt;org.thirdparty2&lt;/groupId&gt;&lt;artifactId&gt;util.*&lt;/artifactId&gt;
+            &lt;/exclusion&gt;
+            &lt;!-- exclude all artifacts ending with '-macos' --&gt;
+            &lt;exclusion&gt;
+                &lt;groupId&gt;*&lt;/groupId&gt;&lt;artifactId&gt;*-macos&lt;/artifactId&gt;
+            &lt;/exclusion&gt;
         &lt;/exclusions
     &lt;/assembly&gt;</pre></div></li>
 <li>ProGuard <tt>options</tt>
