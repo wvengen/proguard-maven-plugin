@@ -37,20 +37,40 @@ public class ArtifactFilter {
     protected String classifier;
 
     public boolean match(Artifact artifact) {
-        boolean artifactMatch = WILDCARD.equals(artifactId) || artifact.getArtifactId().equals(this.artifactId) ||
-                (artifactId != null && getMatcher(artifact).matches());
-        boolean groupMatch = artifact.getGroupId().equals(this.groupId);
+        boolean artifactMatch = WILDCARD.equals(this.artifactId) || artifact.getArtifactId().equals(this.artifactId) ||
+                (artifactId != null && getArtifactIdMatcher(artifact).matches());
+        boolean groupMatch = artifact.getGroupId().equals(this.groupId) ||
+                (groupId != null && getGroupIdMatcher(artifact).matches());
         boolean classifierMatch = ((this.classifier == null) && (artifact.getClassifier() == null)) || ((this.classifier != null) && this.classifier.equals(artifact.getClassifier()));
         return artifactMatch && groupMatch && classifierMatch;
     }
 
-    private Matcher getMatcher(Artifact artifact) {
+    private Matcher getArtifactIdMatcher(Artifact artifact) {
         try {
-            Pattern compile = Pattern.compile(artifactId);
+            Pattern compile = Pattern.compile(escapeRegex(this.artifactId));
             return compile.matcher(artifact.getArtifactId());
         } catch (PatternSyntaxException e) {
-            throw new IllegalArgumentException("Invalid regex artifact filter: " + this, e);
+            throw new IllegalArgumentException("Invalid regex artifactId filter: " + this, e);
         }
+    }
+
+    private Matcher getGroupIdMatcher(Artifact artifact) {
+        try {
+            Pattern compile = Pattern.compile(escapeRegex(this.groupId));
+            return compile.matcher(artifact.getGroupId());
+        } catch (PatternSyntaxException e) {
+            throw new IllegalArgumentException("Invalid regex groupId filter: " + this, e);
+        }
+    }
+    
+    /**
+     * Escape regex and keep wildcard.<br>
+     * {@link Pattern#quote(String)} method wrap string between '\Q' for starting ignoring and '\E' for ending ignoring,<br>
+     * so we don't want to escape wildcard.<br>
+     * 'myregexpart1*myregexpart2' becomes '\Qmyregexpart1\E.*\Qmyregexpart2\E'.
+     */
+    private String escapeRegex(String str) {
+    	return Pattern.quote(str).replace(WILDCARD, "\\E.*\\Q");
     }
 
     @Override

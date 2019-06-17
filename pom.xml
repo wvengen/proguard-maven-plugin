@@ -15,7 +15,7 @@
 	<groupId>com.github.wvengen</groupId>
 	<artifactId>proguard-maven-plugin</artifactId>
 	<name>proguard-maven-plugin</name>
-	<version>2.0.15-SNAPSHOT</version>
+	<version>2.1.1-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<description>Maven 2 Plugin for ProGuard</description>
@@ -33,6 +33,17 @@
 		<connection>scm:git:git://github.com/wvengen/proguard-maven-plugin.git</connection>
 	</scm>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
 	<issueManagement>
 		<system>GitHub</system>
 		<url>https://github.com/wvengen/proguard-maven-plugin/issues</url>
@@ -49,15 +60,26 @@
 			<name>cmorty</name>
 			<email>morty@gmx.net</email>
 		</developer>
+		<developer>
+			<id>lasselindqvist</id>
+			<name>Lasse Lindqvist</name>
+			<email>lasse.k.lindqvist@gmail.com</email>
+		</developer>
 	</developers>
 
+	<contributors>
+		<contributor>
+			<name>Chuckame</name>
+			<email>chuckame@gmail.com</email>
+		</contributor>
+	</contributors>
 
 	<dependencies>
 
 		<dependency>
 			<groupId>net.sf.proguard</groupId>
 			<artifactId>proguard-base</artifactId>
-			<version>5.2.1</version>
+			<version>6.0.3</version>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
@@ -97,8 +119,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 					<compilerArgs>
 						<arg>-Xlint</arg>
 					</compilerArgs>
@@ -151,7 +173,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 
 	</build>
@@ -186,6 +207,38 @@
 		</plugins>
 	</reporting>
 	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.7</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>integration-test</id>
 			<activation>

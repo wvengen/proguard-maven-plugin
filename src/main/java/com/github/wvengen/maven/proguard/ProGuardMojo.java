@@ -21,12 +21,17 @@
 package com.github.wvengen.maven.proguard;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.archiver.MavenArchiveConfiguration;
@@ -44,6 +49,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  *
@@ -328,6 +334,22 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String seedFileName = "proguard_seeds.txt";
 
 	/**
+	 * Sets the name of the ProGuard applying mapping file.
+	 *
+	 * @parameter
+	 */
+	protected File applyMappingFile;
+
+	/**
+	 * Specifies whether or not to enable <a href=
+	 * "https://www.guardsquare.com/en/proguard/manual/examples#incremental">
+	 * incremental obfuscation</a>
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean incremental;
+
+	/**
 	 * The proguard jar to use. useful for using beta versions of
 	 * progaurd that aren't yet on Maven central.
 	 *
@@ -454,34 +476,53 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 
 		Set<String> inPath = new HashSet<String>();
+		Map<Artifact, Inclusion> injars = new HashMap<Artifact, Inclusion>();
+		Map<Artifact, Inclusion> libraryjars = new HashMap<Artifact, Inclusion>();
 		boolean hasInclusionLibrary = false;
 		if (assembly != null && assembly.inclusions != null) {
-			@SuppressWarnings("unchecked")
-			final List<Inclusion> inclusions = assembly.inclusions;
-			for (Inclusion inc : inclusions) {
-				if (!inc.library) {
-					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
-					inPath.add(file.toString());
-					log.debug("--- ADD injars:" + inc.artifactId);
-					StringBuilder filter = new StringBuilder(fileToString(file));
-					filter.append("(!META-INF/MANIFEST.MF");
-					if (!addMavenDescriptor) {
-						filter.append(",");
-						filter.append("!META-INF/maven/**");
+			for (Inclusion inc : assembly.inclusions) {
+				for (Artifact artifact : getDependencies(inc, mavenProject)) {
+					if (inc.library) {
+						if (!injars.containsKey(artifact)) {
+							libraryjars.put(artifact, inc);
+						}
+					} else {
+						injars.put(artifact, inc);
+						if (libraryjars.containsKey(artifact)) {
+							libraryjars.remove(artifact);
+						}
 					}
-					if (inc.filter != null) {
-						filter.append(",").append(inc.filter);
-					}
-					filter.append(")");
-					args.add("-injars");
-					args.add(filter.toString());
+				}
+			}
+
+			for (Entry<Artifact, Inclusion> entry : injars.entrySet()) {
+				log.info("--- ADD injars:" + entry.getKey().getArtifactId());
+				File file = getClasspathElement(entry.getKey(), mavenProject);
+				inPath.add(file.toString());
+				StringBuilder filter = new StringBuilder(fileToString(file));
+				filter.append("(!META-INF/MANIFEST.MF");
+				if (!addMavenDescriptor) {
+					filter.append(",");
+					filter.append("!META-INF/maven/**");
+				}
+				if (entry.getValue().filter != null) {
+					filter.append(",").append(entry.getValue().filter);
+				}
+				filter.append(")");
+				args.add("-injars");
+				args.add(filter.toString());
+			}
+
+			for (Entry<Artifact, Inclusion> entry : libraryjars.entrySet()) {
+				log.info("--- ADD libraryjars:" + entry.getKey().getArtifactId());
+				File file = getClasspathElement(entry.getKey(), mavenProject);
+				hasInclusionLibrary = true;
+				inPath.add(file.toString());
+				if (putLibraryJarsInTempDir) {
+					libraryJars.add(file);
 				} else {
-					hasInclusionLibrary = true;
-					log.debug("--- ADD libraryjars:" + inc.artifactId);
-					// This may not be CompileArtifacts, maven 2.0.6 bug
-					File file = getClasspathElement(getDependency(inc, mavenProject), mavenProject);
-					inPath.add(file.toString());
-					addLibraryJar(args, libraryJars, file);
+					args.add("-libraryjars");
+					args.add(fileToString(file));
 				}
 			}
 		}
@@ -590,11 +631,21 @@ public class ProGuardMojo extends AbstractMojo {
 			args.add(fileToString(tempLibraryjarsDir));
 		}
 
+		File mappingFile = new File(outputDirectory, mappingFileName);
 		args.add("-printmapping");
-		args.add(fileToString((new File(outputDirectory, mappingFileName).getAbsoluteFile())));
+		args.add(fileToString(mappingFile.getAbsoluteFile()));
 
 		args.add("-printseeds");
 		args.add(fileToString((new File(outputDirectory,seedFileName).getAbsoluteFile())));
+
+		if (incremental && applyMappingFile == null) {
+			throw new MojoFailureException("applyMappingFile is required if incremental is true");
+		}
+
+		if (applyMappingFile != null && (!incremental || applyMappingFile.exists())) {
+			args.add("-applymapping");
+			args.add(fileToString(applyMappingFile.getAbsoluteFile()));
+		}
 
 		if (log.isDebugEnabled()) {
 			args.add("-verbose");
@@ -634,20 +685,15 @@ public class ProGuardMojo extends AbstractMojo {
 
 			try {
 				jarArchiver.addArchivedFileSet(baseFile);
-				@SuppressWarnings("unchecked")
-				final List<Inclusion> inclusions = assembly.inclusions;
-				for (Inclusion inc : inclusions) {
-					if (inc.library) {
-						File file;
-						Artifact artifact = getDependency(inc, mavenProject);
-						file = getClasspathElement(artifact, mavenProject);
-						if (file.isDirectory()) {
-							getLog().info("merge project: " + artifact.getArtifactId() + " " + file);
-							jarArchiver.addDirectory(file);
-						} else {
-							getLog().info("merge artifact: " + artifact.getArtifactId());
-							jarArchiver.addArchivedFileSet(file);
-						}
+				for (Entry<Artifact, Inclusion> entry : libraryjars.entrySet()) {
+					File file;
+					file = getClasspathElement(entry.getKey(), mavenProject);
+					if (file.isDirectory()) {
+						getLog().info("merge project: " + entry.getKey() + " " + file);
+						jarArchiver.addDirectory(file);
+					} else {
+						getLog().info("merge artifact: " + entry.getKey());
+						jarArchiver.addArchivedFileSet(file);
 					}
 				}
 
@@ -657,6 +703,27 @@ public class ProGuardMojo extends AbstractMojo {
 				throw new MojoExecutionException("Unable to create jar", e);
 			}
 
+		}
+
+		if (incremental) {
+			log.info("Merging mapping file into " + applyMappingFile);
+
+			try {
+				FileInputStream mappingFileIn = new FileInputStream(mappingFile);
+				try {
+					applyMappingFile.getParentFile().mkdirs();
+					FileOutputStream mappingFileOut = new FileOutputStream(applyMappingFile, true);
+					try {
+						IOUtil.copy(mappingFileIn, mappingFileOut);
+					} finally {
+						mappingFileOut.close();
+					}
+				} finally {
+					mappingFileIn.close();
+				}
+			} catch (IOException e) {
+				throw new MojoExecutionException("Unable to merge mapping file", e);
+			}
 		}
 
 		if (attach) {
@@ -849,16 +916,19 @@ public class ProGuardMojo extends AbstractMojo {
 		}
 	}
 
-
-	private Artifact getDependency(Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
+	private Set<Artifact> getDependencies(final Inclusion inc, MavenProject mavenProject) throws MojoExecutionException {
 		@SuppressWarnings("unchecked")
-		Set<Artifact> dependency = mavenProject.getArtifacts();
-		for (Artifact artifact : dependency) {
+		Set<Artifact> dependencies = mavenProject.getArtifacts();
+		Set<Artifact> result = new HashSet<Artifact>();
+		for (Artifact artifact : dependencies) {
 			if (inc.match(artifact)) {
-				return artifact;
+				result.add(artifact);
 			}
 		}
-		throw new MojoExecutionException("artifactId Not found " + inc.artifactId);
+		if (result.isEmpty()) {
+			log.warn(String.format("No artifact found : %s:%s", inc.artifactId, inc.groupId));
+		}
+		return result;
 	}
 
 	private boolean isExclusion(Artifact artifact) {
@@ -877,8 +947,12 @@ public class ProGuardMojo extends AbstractMojo {
 		if (artifact.getClassifier() != null) {
 			return artifact.getFile();
 		}
-		String refId = artifact.getGroupId() + ":" + artifact.getArtifactId();
+		String refId = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
 		MavenProject project = (MavenProject) mavenProject.getProjectReferences().get(refId);
+		if (project == null) {
+			refId = artifact.getGroupId() + ":" + artifact.getArtifactId();
+			project = (MavenProject) mavenProject.getProjectReferences().get(refId);
+		}
 		if (project != null) {
 			return new File(project.getBuild().getOutputDirectory());
 		} else {
