@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
@@ -48,8 +50,6 @@ import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  *
@@ -617,22 +617,36 @@ public class ProGuardMojo extends AbstractMojo {
 							try{
 								FileUtils.deleteDirectory(tempLibraryjarsDir);
 							} catch(IOException ignored){
-								// NO-OP
+								throw new MojoFailureException("Deleting failed libraryJars directory", ignored);
 							}
 			}
 			tempLibraryjarsDir.mkdir();
 			if (!tempLibraryjarsDir.exists()) {
 				throw new MojoFailureException("Can't create temporary libraryJars directory: " + tempLibraryjarsDir.getAbsolutePath());
 			}
+			// Use this subdirectory for all libraries that are files, and not directories themselves
+			File commonDir = new File(tempLibraryjarsDir, "0");
+			commonDir.mkdir();
+
+			int directoryIndex = 1;
 			for (File libraryJar : libraryJars) {
 				try {
-					FileUtils.copyFileToDirectory(libraryJar, tempLibraryjarsDir);
+					log.debug("Copying library: " + libraryJar);
+					if (libraryJar.isFile()) {
+						FileUtils.copyFileToDirectory(libraryJar, commonDir);
+					} else {
+						File subDir = new File(tempLibraryjarsDir, String.valueOf(directoryIndex));
+						FileUtils.copyDirectory(libraryJar, subDir);
+						args.add("-libraryjars");
+						args.add(fileToString(subDir));
+					}
 				} catch (IOException e) {
 					throw new MojoFailureException("Can't copy to temporary libraryJars directory", e);
 				}
+				directoryIndex++;
 			}
 			args.add("-libraryjars");
-			args.add(fileToString(tempLibraryjarsDir));
+			args.add(fileToString(commonDir));
 		}
 
 		File mappingFile = new File(outputDirectory, mappingFileName);
@@ -718,7 +732,7 @@ public class ProGuardMojo extends AbstractMojo {
 					applyMappingFile.getParentFile().mkdirs();
 					FileOutputStream mappingFileOut = new FileOutputStream(applyMappingFile, true);
 					try {
-						IOUtil.copy(mappingFileIn, mappingFileOut);
+						IOUtils.copy(mappingFileIn, mappingFileOut);
 					} finally {
 						mappingFileOut.close();
 					}
@@ -945,9 +959,12 @@ public class ProGuardMojo extends AbstractMojo {
 			project = (MavenProject) mavenProject.getProjectReferences().get(refId);
 		}
 		if (project != null) {
-			return new File(project.getBuild().getOutputDirectory());
+			File file = new File(project.getBuild().getOutputDirectory());
+			log.debug("Found directory: " + file.getAbsolutePath());
+			return file;
 		} else {
 			File file = artifact.getFile();
+			log.debug("Found file: " + file.getAbsolutePath());
 			if ((file == null) || (!file.exists())) {
 				throw new MojoExecutionException("Dependency Resolution Required " + artifact);
 			}
