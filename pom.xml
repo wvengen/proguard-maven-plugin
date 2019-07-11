@@ -18,7 +18,7 @@
 	<version>2.1.2-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
-	<description>Maven 2 Plugin for ProGuard</description>
+	<description>Maven 3 Plugin for ProGuard</description>
 	<url>https://github.com/wvengen/proguard-maven-plugin</url>
 
 	<licenses>
