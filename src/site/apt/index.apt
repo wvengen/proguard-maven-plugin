@@ -79,22 +79,22 @@ proguard-maven-plugin
                 <groupId>org.thirdparty</groupId><artifactId>*</artifactId>
             </inclusion>
         </inclusions>
-        <exclusions>
-            <!-- groupId and artifactId support wildcards, including partial matching -->
-            <!-- exclude all org.thirdparty1 artifacts -->
-            <exclusion>
-                <groupId>org.thirdparty1</groupId><artifactId>*</artifactId>
-            </exclusion>
-            <!-- exclude all org.thirdparty2 artifacts beginning with 'util.' -->
-            <exclusion>
-                <groupId>org.thirdparty2</groupId><artifactId>util.*</artifactId>
-            </exclusion>
-            <!-- exclude all artifacts ending with '-macos' -->
-            <exclusion>
-                <groupId>*</groupId><artifactId>*-macos</artifactId>
-            </exclusion>
-        </exclusions
     </assembly>
+    <exclusions>
+        <!-- groupId and artifactId support wildcards, including partial matching -->
+        <!-- exclude all org.thirdparty1 artifacts -->
+        <exclusion>
+            <groupId>org.thirdparty1</groupId><artifactId>*</artifactId>
+        </exclusion>
+        <!-- exclude all org.thirdparty2 artifacts beginning with 'util.' -->
+        <exclusion>
+            <groupId>org.thirdparty2</groupId><artifactId>util.*</artifactId>
+        </exclusion>
+        <!-- exclude all artifacts ending with '-macos' -->
+        <exclusion>
+            <groupId>*</groupId><artifactId>*-macos</artifactId>
+        </exclusion>
+    </exclusions>
 ---
 
     ** ProGuard <<<options>>>
