@@ -188,6 +188,13 @@ public class ProGuardMojo extends AbstractMojo {
 	protected String inFilter;
 
 	/**
+	 * Apply ProGuard classpathentry Filters to all input lib jars. e.g. <code>!META-INF/**,!META-INF/versions/9/**.class</code>
+	 *
+	 * @parameter
+	 */
+	protected String inLibsFilter;
+
+	/**
 	 * Specifies the names of the output jars. If attach=true the value ignored and name constructed base on classifier
 	 * If empty input jar would be overdriven.
 	 *
@@ -372,6 +379,18 @@ public class ProGuardMojo extends AbstractMojo {
 		return fileNameToString(file.toString());
 	}
 
+	private String libFileToStringWithInLibsFilter(File file) {
+		return libFileToStringWithInLibsFilter(file.toString());
+	}
+
+	private String libFileToStringWithInLibsFilter(String file) {
+		StringBuilder filter = new StringBuilder(fileNameToString(file));
+		if ((inLibsFilter != null)) {
+			filter.append("(").append(inLibsFilter).append(")");
+		}
+		return filter.toString();
+	}
+
 	private boolean useArtifactClassifier() {
 		return appendClassifier && ((attachArtifactClassifier != null) && (attachArtifactClassifier.length() > 0));
 	}
@@ -516,7 +535,7 @@ public class ProGuardMojo extends AbstractMojo {
 					libraryJars.add(file);
 				} else {
 					args.add("-libraryjars");
-					args.add(fileToString(file));
+					args.add(libFileToStringWithInLibsFilter(file));
 				}
 			}
 		}
@@ -570,7 +589,7 @@ public class ProGuardMojo extends AbstractMojo {
 						libraryJars.add(file);
 					} else {
 						args.add("-libraryjars");
-						args.add(fileToString(file));
+						args.add(libFileToStringWithInLibsFilter(file));
 					}
 				}
 			}
@@ -605,7 +624,7 @@ public class ProGuardMojo extends AbstractMojo {
 					libraryJars.add(new File(lib));
 				} else {
 					args.add("-libraryjars");
-					args.add(fileNameToString(lib));
+					args.add(libFileToStringWithInLibsFilter(lib));
 				}
 			}
 		}
@@ -638,7 +657,7 @@ public class ProGuardMojo extends AbstractMojo {
 						File subDir = new File(tempLibraryjarsDir, String.valueOf(directoryIndex));
 						FileUtils.copyDirectory(libraryJar, subDir);
 						args.add("-libraryjars");
-						args.add(fileToString(subDir));
+						args.add(libFileToStringWithInLibsFilter(subDir));
 					}
 				} catch (IOException e) {
 					throw new MojoFailureException("Can't copy to temporary libraryJars directory", e);
@@ -646,7 +665,7 @@ public class ProGuardMojo extends AbstractMojo {
 				directoryIndex++;
 			}
 			args.add("-libraryjars");
-			args.add(fileToString(commonDir));
+			args.add(libFileToStringWithInLibsFilter(commonDir));
 		}
 
 		File mappingFile = new File(outputDirectory, mappingFileName);

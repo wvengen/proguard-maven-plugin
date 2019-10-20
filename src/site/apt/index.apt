@@ -31,6 +31,12 @@ proguard-maven-plugin
     <inFilter>!org/microemu/app/classloader/**</inFilter>
 ---
 
+    ** You can use <<<inLibsFilter>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to all input lib jars
+
+---
+    <inLibsFilter>!META-INF/versions/**</inLibsFilter>
+---
+
     ** You can use <<<outFilter>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to output jar
 
 ---
