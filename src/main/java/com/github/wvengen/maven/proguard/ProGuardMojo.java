@@ -252,7 +252,7 @@ public class ProGuardMojo extends AbstractMojo {
 	private boolean appendClassifier;
 
 	/**
-	 * Set to true to include META-INF/maven/** maven descriptord
+	 * Set to true to include META-INF/maven/** maven descriptor
 	 *
 	 * @parameter default-value="false"
 	 */
