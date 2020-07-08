@@ -835,7 +835,7 @@ public class ProGuardMojo extends AbstractMojo {
 				} else if (proguardArtifactDistance == -1) {
 					proguardArtifacts.add(artifact);
 					proguardArtifactDistance = distance;
-				} else if (distance < proguardArtifactDistance) {
+				} else if (distance <= proguardArtifactDistance) {
 					Iterator<Artifact> it = proguardArtifacts.iterator();
 					while (it.hasNext()) {
 						Artifact art = it.next();
