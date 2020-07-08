@@ -831,7 +831,6 @@ public class ProGuardMojo extends AbstractMojo {
 				mojo.getLog().debug("proguard DependencyTrail: " + distance);
 				if ((mojo.proguardVersion != null) && (mojo.proguardVersion.equals(artifact.getVersion()))) {
 					proguardArtifacts.add(artifact);
-					break;
 				} else if (proguardArtifactDistance == -1) {
 					proguardArtifacts.add(artifact);
 					proguardArtifactDistance = distance;
