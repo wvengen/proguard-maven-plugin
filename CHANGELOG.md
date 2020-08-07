@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 2.3.0 (released 2020-08-07)
+
+- Support OpenJDK14 ([111][])
+- Use Proguard 7.0.0 by default ([111][])
+
+## 2.2.0 (released 2019-1022)
+
+- Use Proguard 6.1.1 by default ([64][])
+- Add parameter inLibsFilter ([103][])
+- Change license.txt to Apache 2.0 ([28][])
+- Fix assembly and exclusions hierarchy in examples ([74][])
+
 ## 2.1.1 (released 2019-07-04)
 
 - Fix wildcard support ([68][])
