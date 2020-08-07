@@ -5,8 +5,8 @@ Run [ProGuard] as part of your [Maven] build. For usage, please read the
 generated [Documentation](http://wvengen.github.io/proguard-maven-plugin/).
 
 Development happens at [Github](https://github.com/wvengen/proguard-maven-plugin).
-This plugin is currently not under active development, but pull requests are
-welcome.
+This plugin is in a mature state, so major development changes are not expected.
+Pull requests are welcome.
 
 This is the successor of the [ProGuard Maven Plugin by pyx4me](http://pyx4me.com/pyx4me-maven-plugins/proguard-maven-plugin/).
 
