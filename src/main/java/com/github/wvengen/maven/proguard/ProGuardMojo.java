@@ -730,7 +730,30 @@ public class ProGuardMojo extends AbstractMojo {
 						jarArchiver.addDirectory(file);
 					} else {
 						getLog().info("merge artifact: " + entry.getKey());
-						jarArchiver.addArchivedFileSet(file);
+						
+						// Respect filter if set
+						String filter = entry.getValue().filter;
+						if(filter == null) {
+							jarArchiver.addArchivedFileSet(file);
+						} else {
+						    
+						    // Filter elements must be separated int two lists
+						    List<String> includes = new ArrayList<String>();
+						    List<String> excludes = new ArrayList<String>();
+
+						    // Elements starting with ! should be excluded while others should be included
+						    for(String element : filter.split(",")) {
+							if(element.startsWith("!")) {
+							    excludes.add(element.substring(1));
+							}else {
+							    includes.add(element);
+							}
+						    }
+
+						    jarArchiver.addArchivedFileSet(file,
+							    (includes.isEmpty() ? null : includes.toArray(new String[0])),
+							    (excludes.isEmpty() ? null : excludes.toArray(new String[0])));
+						}
 					}
 				}
 
