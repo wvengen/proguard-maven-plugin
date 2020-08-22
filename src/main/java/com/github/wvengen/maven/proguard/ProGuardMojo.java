@@ -750,6 +750,7 @@ public class ProGuardMojo extends AbstractMojo {
 							}
 						    }
 
+						    // Null is important on empty includes otherwise nothing gets included
 						    jarArchiver.addArchivedFileSet(file,
 							    (includes.isEmpty() ? null : includes.toArray(new String[0])),
 							    (excludes.isEmpty() ? null : excludes.toArray(new String[0])));
