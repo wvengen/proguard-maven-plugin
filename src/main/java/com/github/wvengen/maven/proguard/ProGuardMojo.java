@@ -848,11 +848,32 @@ public class ProGuardMojo extends AbstractMojo {
 		//both of which need to be on the classpath.
 		for (Artifact artifact : mojo.pluginArtifacts) {
 			mojo.getLog().debug("pluginArtifact: " + artifact.getFile());
+
 			final String artifactId = artifact.getArtifactId();
 			if (artifactId.startsWith((useDexGuard ? "dexguard" : "proguard"))
 					&& !artifactId.startsWith("proguard-maven-plugin")) {
 				int distance = artifact.getDependencyTrail().size();
 				mojo.getLog().debug("proguard DependencyTrail: " + distance);
+
+				// Skip dependency if proguardVersion is defined and dependency does not match given version
+				if ((mojo.proguardVersion != null) && (!mojo.proguardVersion.equals(artifact.getVersion()))) {
+				    continue;
+				}
+
+				/*
+				 *  Check if artifact has been defined twice - eg. no proguardVersion given but dependency for proguard
+				 *  defined in plugin config
+				 */
+				for (Artifact existingArtifact : proguardArtifacts) {
+				    if(existingArtifact.getArtifactId().equals(artifactId)) {
+					mojo.getLog().warn("Dependency for proguard defined twice! This may lead to unexpected results: "
+						+ existingArtifact.getArtifactId() + ":" + existingArtifact.getVersion()
+						+ " | "
+						+ artifactId + ":" + artifact.getVersion());
+					break;
+				    }
+				}
+
 				if ((mojo.proguardVersion != null) && (mojo.proguardVersion.equals(artifact.getVersion()))) {
 					proguardArtifacts.add(artifact);
 				} else if (proguardArtifactDistance == -1) {
