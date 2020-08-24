@@ -7,6 +7,8 @@
 		<label>NO_LABEL</label>
 		<cctimestamp>NO_TIMESTAMP</cctimestamp>
 		<scm.revision>NO_SCM_REVISION</scm.revision>
+
+		<version.proguard>7.0.0</version.proguard>
 	</properties>
 
 
@@ -86,10 +88,18 @@
 	
 	<dependencies>
 
+		<!-- From version 7 on we need to add two dependencies -->
 		<dependency>
 			<groupId>com.guardsquare</groupId>
 			<artifactId>proguard-base</artifactId>
-			<version>7.0.0</version>
+			<version>${version.proguard}</version>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.guardsquare</groupId>
+			<artifactId>proguard-core</artifactId>
+			<version>${version.proguard}</version>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
