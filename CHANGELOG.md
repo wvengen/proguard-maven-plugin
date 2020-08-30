@@ -7,10 +7,15 @@
 - Respect filter on library merge ([114][])
 - NoClassDefFoundError: proguard.classfile.visitor.ClassVisitor on OpenJ9 JDK 8 ([112][])
 
+[114]: https://github.com/wvengen/proguard-maven-plugin/pull/114
+[112]: https://github.com/wvengen/proguard-maven-plugin/pull/112
+
 ## 2.3.0 (released 2020-08-07)
 
 - Support OpenJDK14 ([111][])
 - Use Proguard 7.0.0 by default ([111][])
+
+[111]: https://github.com/wvengen/proguard-maven-plugin/pull/111
 
 ## 2.2.0 (released 2019-1022)
 
@@ -18,6 +23,11 @@
 - Add parameter inLibsFilter ([103][])
 - Change license.txt to Apache 2.0 ([28][])
 - Fix assembly and exclusions hierarchy in examples ([74][])
+
+[64]: https://github.com/wvengen/proguard-maven-plugin/pull/64
+[103]: https://github.com/wvengen/proguard-maven-plugin/pull/103
+[28]: https://github.com/wvengen/proguard-maven-plugin/pull/28
+[74]: https://github.com/wvengen/proguard-maven-plugin/pull/74
 
 ## 2.1.1 (released 2019-07-04)
 
