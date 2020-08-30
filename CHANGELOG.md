@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 2.3.1 (released 2020-08-30)
+
+- Respect filter on library merge ([114][])
+- NoClassDefFoundError: proguard.classfile.visitor.ClassVisitor on OpenJ9 JDK 8 ([112][])
+
 ## 2.3.0 (released 2020-08-07)
 
 - Support OpenJDK14 ([111][])
