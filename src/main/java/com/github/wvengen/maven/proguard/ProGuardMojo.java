@@ -21,6 +21,7 @@
 package com.github.wvengen.maven.proguard;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -131,6 +132,19 @@ public class ProGuardMojo extends AbstractMojo {
 	 * @parameter default-value="false"
 	 */
 	private boolean putLibraryJarsInTempDir;
+
+	/**
+	 * Create a temporary configuration file
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean generateTemporaryConfigurationFile;
+
+	/**
+	 * @parameter expression="${project.build.directory}/generated-proguard.conf"
+	 * @readonly
+	 */
+	private File temporaryConfigurationFile;
 
 	/**
 	 * Specifies that project compile dependencies should be added as injar.
@@ -691,6 +705,32 @@ public class ProGuardMojo extends AbstractMojo {
 
 		if (options != null) {
 			Collections.addAll(args, options);
+		}
+
+
+		if(generateTemporaryConfigurationFile) {
+			log.info("building config file");
+
+			StringBuilder stringBuilder = new StringBuilder();
+			for (String arg : args) {
+				if (arg.startsWith("-")) {
+					stringBuilder.append("\n");
+				}else{
+					stringBuilder.append(" ");
+				}
+				stringBuilder.append(arg);
+			}
+
+			try {
+				FileWriter writer = new FileWriter(temporaryConfigurationFile);
+				IOUtils.write(stringBuilder.toString(), writer);
+				writer.close();
+			} catch (IOException e) {
+				throw new MojoFailureException("cannot write to temporary configuration file " + temporaryConfigurationFile, e);
+			}
+			args = new ArrayList<String>();
+			args.add("-include");
+			args.add(fileToString(temporaryConfigurationFile));
 		}
 
 		log.info("execute ProGuard " + args.toString());
