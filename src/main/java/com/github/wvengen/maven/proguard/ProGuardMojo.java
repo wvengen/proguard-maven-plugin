@@ -715,19 +715,24 @@ public class ProGuardMojo extends AbstractMojo {
 			for (String arg : args) {
 				if (arg.startsWith("-")) {
 					stringBuilder.append("\n");
-				}else{
+				} else {
 					stringBuilder.append(" ");
 				}
 				stringBuilder.append(arg);
 			}
 
+			FileWriter writer = null;
 			try {
-				FileWriter writer = new FileWriter(temporaryConfigurationFile);
+				writer = new FileWriter(temporaryConfigurationFile);
 				IOUtils.write(stringBuilder.toString(), writer);
-				writer.close();
 			} catch (IOException e) {
 				throw new MojoFailureException("cannot write to temporary configuration file " + temporaryConfigurationFile, e);
-			}
+			} finally {
+			    if(writer != null) {
+                    writer.close();
+                }
+            }
+
 			args = new ArrayList<String>();
 			args.add("-include");
 			args.add(fileToString(temporaryConfigurationFile));
