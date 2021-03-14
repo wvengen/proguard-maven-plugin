@@ -134,7 +134,10 @@ public class ProGuardMojo extends AbstractMojo {
 	private boolean putLibraryJarsInTempDir;
 
 	/**
-	 * Create a temporary configuration file
+	 * Use this parameter if your command line arguments become too long and execution fails.
+     *
+     * If this parameter is 'true', the configuration is passed to the proguard process through a file, instead of through
+     * command line arguments. This bypasses the operating system restrictions on the length of the command line arguments.
 	 *
 	 * @parameter default-value="false"
 	 */
