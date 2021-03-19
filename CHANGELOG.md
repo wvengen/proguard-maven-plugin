@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Minimum Java version bumped to 1.8 ([127][])
+- Support workaround for long command line problems ([113][])
+
+
 ## 2.3.1 (released 2020-08-30)
 
 - Respect filter on library merge ([114][])
