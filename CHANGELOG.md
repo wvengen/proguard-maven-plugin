@@ -5,6 +5,8 @@
 - Minimum Java version bumped to 1.8 ([127][])
 - Support workaround for long command line problems ([113][])
 
+[127]: https://github.com/wvengen/proguard-maven-plugin/pull/127
+[113]: https://github.com/wvengen/proguard-maven-plugin/pull/113
 
 ## 2.3.1 (released 2020-08-30)
 
