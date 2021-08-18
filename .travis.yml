@@ -32,3 +32,7 @@ env:
     - secure: "gAcihr3TvEreNbfIEaTY6/7KKx53M3ISiUBrzWu4tDYUjD1u9JyniP5PiFVOCp2lIvBWUFGj1BoN6Fsi/XISCMU0UnOftf6rB4JbwAgQaXuXV/bZeRxvPJhwMZRKw6Pb00CAFl2P404hhas0fRNnyk4YnJy1vMwiX5NRfHgHa2Q="
     - secure: "PimFB8u3FuLspriAc/PRtt+Lubwi8NpMB+LIQG9NS26yk1zULWTn0r3/5EHl+sCZlSOvFRak3fi8iO0/6Id9jpbsrg57Pa91mnJp7Pr/5CX/qtJ0UwwVleB2GeHWrdOc5l4NWIHunHVdfhxnVLGqMTZn0hZdgQ9zZdgPzb8KZ5E="
     - secure: "Es0EHDjxSFJdzREvFTMo8i+nU1HMisqJ10xMIFMVH8xo2+bgQqgX40JEKEP5orNTEeq+C2FDwFEi6u39HWs/aUZ3HmFaACOrb+9qDkjoMHj+/iLBskoFZPflt9SsMIqZEX+cP1avprQjzRdAckp5e1fZHlG8ocNq3Dep3gg5uYk="
+
+cache:
+  directories:
+  - $HOME/.m2
