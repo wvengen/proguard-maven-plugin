@@ -8,7 +8,8 @@
 		<cctimestamp>NO_TIMESTAMP</cctimestamp>
 		<scm.revision>NO_SCM_REVISION</scm.revision>
 
-		<version.proguard>7.1.0-beta3</version.proguard>
+		<version.proguard>7.2.0-beta2</version.proguard>
+		<version.proguard-core>8.0.1</version.proguard-core>
 	</properties>
 
 
@@ -88,7 +89,7 @@
 		<dependency>
 			<groupId>com.guardsquare</groupId>
 			<artifactId>proguard-core</artifactId>
-			<version>${version.proguard}</version>
+			<version>${version.proguard-core}</version>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
