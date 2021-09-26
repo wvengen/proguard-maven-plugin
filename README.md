@@ -2,7 +2,7 @@ ProGuard Maven Plugin
 ---------------------
 
 Run [ProGuard] as part of your [Maven] build. For usage, please read the
-generated [Documentation](http://wvengen.github.io/proguard-maven-plugin/).
+generated [Documentation](https://wvengen.github.io/proguard-maven-plugin/).
 
 Development happens at [Github](https://github.com/wvengen/proguard-maven-plugin).
 This plugin is in a mature state, so major development changes are not expected.
