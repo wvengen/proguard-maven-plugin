@@ -866,6 +866,27 @@ public class ProGuardMojo extends AbstractMojo {
 
 		}
 	}
+	
+	private Set<File> getAllPluginArtifactDependencies(ProGuardMojo mojo) throws MojoExecutionException {
+		Set<File> files = new HashSet<>(getProguardJars(mojo));
+		for (Artifact artifact : mojo.pluginArtifacts) {
+			files.add(artifact.getFile().getAbsoluteFile());
+			files.addAll(getChildArtifacts(artifact));
+		}
+		
+		return files;
+	}
+
+	private Set<File> getChildArtifacts(Artifact artifact) {
+		Set<File> files = new HashSet<>();
+		for (Object child : artifact.getDependencyTrail()) {
+			if (child instanceof Artifact) {
+				files.add(((Artifact) child).getFile().getAbsoluteFile());
+				files.addAll(getChildArtifacts((Artifact) child));
+			}
+		}
+		return files;
+	}
 
 	private List<File> getProguardJars(ProGuardMojo mojo) throws MojoExecutionException {
 
@@ -984,8 +1005,10 @@ public class ProGuardMojo extends AbstractMojo {
 		java.setTaskName("proguard");
 
 		mojo.getLog().info("proguard jar: " + proguardJars);
+		
+		Set<File> allDependencyFiles = getAllPluginArtifactDependencies(mojo);
 
-		for (File p : proguardJars)
+		for (File p : allDependencyFiles)
 			java.createClasspath().createPathElement().setLocation(p);
 		// java.createClasspath().setPath(System.getProperty("java.class.path"));
 		java.setClassname(mojo.proguardMainClass);
