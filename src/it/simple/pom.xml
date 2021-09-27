@@ -14,14 +14,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <compilerArgs>
-            <arg>-Xlint</arg>
-          </compilerArgs>
-        </configuration>
+        <version>3.8.0</version>
+		<configuration>
+			<release>11</release>
+		</configuration>
       </plugin>
       <plugin>
         <groupId>com.github.wvengen</groupId>
@@ -39,6 +35,14 @@
         <configuration>
           <attach>true</attach>
         </configuration>
+    <dependencies>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.14.1</version>
+      <scope>runtime</scope>
+    </dependency>
+    </dependencies>
       </plugin>
     </plugins>
   </build>
