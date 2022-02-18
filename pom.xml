@@ -8,7 +8,7 @@
 		<cctimestamp>NO_TIMESTAMP</cctimestamp>
 		<scm.revision>NO_SCM_REVISION</scm.revision>
 
-		<version.proguard>7.2.0</version.proguard>
+		<version.proguard>7.2.1</version.proguard>
 		<version.proguard-core>8.0.6</version.proguard-core>
 	</properties>
 
