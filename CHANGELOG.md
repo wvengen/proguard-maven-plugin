@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- Allow to preserve the manifest file
-- Minimum Java version bumped to 1.8 ([127][])
+- Allow to preserve the manifest file ([211][])
+- Minimum Java version bumped to 1.8  ([127][])
 - Support workaround for long command line problems ([113][])
 
 [211]: https://github.com/wvengen/proguard-maven-plugin/issues/211
