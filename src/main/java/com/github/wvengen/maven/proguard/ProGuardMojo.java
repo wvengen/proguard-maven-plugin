@@ -270,6 +270,13 @@ public class ProGuardMojo extends AbstractMojo {
 	private boolean appendClassifier;
 
 	/**
+	 * Set to true to include META-INF/MANIFEST.MF file
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean addManifest;
+
+	/**
 	 * Set to true to include META-INF/maven/** maven descriptor
 	 *
 	 * @parameter default-value="false"
@@ -531,15 +538,19 @@ public class ProGuardMojo extends AbstractMojo {
 				File file = getClasspathElement(entry.getKey(), mavenProject);
 				inPath.add(file.toString());
 				StringBuilder filter = new StringBuilder(fileToString(file));
-				filter.append("(!META-INF/MANIFEST.MF");
+				List<String> filterList = new ArrayList<>();
+				if (!addManifest) {
+					filterList.add("!META-INF/MANIFEST.MF");
+				}
 				if (!addMavenDescriptor) {
-					filter.append(",");
-					filter.append("!META-INF/maven/**");
+					filterList.add("!META-INF/maven/**");
 				}
 				if (entry.getValue().filter != null) {
-					filter.append(",").append(entry.getValue().filter);
+					filterList.add(entry.getValue().filter);
 				}
-				filter.append(")");
+				if (filterList.size() > 0){
+					filter.append("(").append(String.join(",",filterList)).append( ")");
+				}
 				args.add("-injars");
 				args.add(filter.toString());
 			}
