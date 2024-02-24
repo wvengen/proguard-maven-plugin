@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 2.6.1
+
+- Many dependency updates.
+- proguard-base to 7.4.1
+- proguard-core from to 9.1.1
+
+## Some release before 2.6.1
 
 - Allow to preserve the manifest file ([211][])
 - Minimum Java version bumped to 1.8  ([127][])
