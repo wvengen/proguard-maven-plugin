@@ -9,7 +9,7 @@
 		<scm.revision>NO_SCM_REVISION</scm.revision>
 
 		<version.proguard>7.6.0</version.proguard>
-		<version.proguard-core>9.1.6</version.proguard-core>
+		<version.proguard-core>9.1.7</version.proguard-core>
 	</properties>
 
 
