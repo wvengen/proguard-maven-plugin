@@ -389,6 +389,13 @@ public class ProGuardMojo extends AbstractMojo {
 	 */
 	private boolean silent;
 
+	/**
+	 * bind proguard output to maven plugin logging.
+	 *
+	 * @parameter default-value="false"
+	 */
+	private boolean bindToMavenLogging;
+
 	private Log log;
 
 	/**
@@ -1003,9 +1010,14 @@ public class ProGuardMojo extends AbstractMojo {
 		antProject.setName(mojo.mavenProject.getName());
 		antProject.init();
 
-		DefaultLogger antLogger = new DefaultLogger();
-		antLogger.setOutputPrintStream(System.out);
-		antLogger.setErrorPrintStream(System.err);
+		DefaultLogger antLogger;
+		if (bindToMavenLogging) {
+			antLogger = new MavenloggingBinder(mojo.log);
+		} else {
+			antLogger = new DefaultLogger();
+			antLogger.setOutputPrintStream(System.out);
+			antLogger.setErrorPrintStream(System.err);
+		}
 		int logLevel = mojo.log.isDebugEnabled() ? Project.MSG_DEBUG : Project.MSG_INFO;
 		antLogger.setMessageOutputLevel(silent ? Project.MSG_ERR : logLevel);
 
