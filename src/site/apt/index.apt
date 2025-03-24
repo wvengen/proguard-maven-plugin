@@ -10,7 +10,7 @@ proguard-maven-plugin
 
 * Overview
 
-  The proguard-maven-plugin is maven2 plugin to execute {{{http://proguard.sourceforge.net/}ProGuard}}
+  The proguard-maven-plugin is a Maven plugin to execute {{{https://www.guardsquare.com/proguard}ProGuard}}
 
 * Parameters
 
@@ -25,19 +25,19 @@ proguard-maven-plugin
     </libs>
 ---
 
-    ** You can use <<<inFilter>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to input jar
+    ** You can use <<<inFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry Filters}} to input jar
 
 ---
     <inFilter>!org/microemu/app/classloader/**</inFilter>
 ---
 
-    ** You can use <<<inLibsFilter>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to all input lib jars
+    ** You can use <<<inLibsFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry Filters}} to all input lib jars
 
 ---
     <inLibsFilter>!META-INF/versions/**</inLibsFilter>
 ---
 
-    ** You can use <<<outFilter>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to output jar
+    ** You can use <<<outFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry Filters}} to output jar
 
 ---
     <outFilter>!**ECLIPSEF.*</outFilter>
@@ -61,13 +61,13 @@ proguard-maven-plugin
     Some flagged as <<<library>>> doesn`t need to be processed by ProGuard are added as -libraryjars and added to resulting jar by plugin after ProGuard is finished.
     For clarity param <<<includeDependency>>> will just add -libraryjars arg to ProGuard and Dependency is not included in resulting jar.
 
-    You can use <<<assembly>>> to apply ProGuard {{{http://proguard.sourceforge.net/manual/usage.html#filters}classpathentry Filters}} to dependency jars
+    You can use <<<assembly>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry Filters}} to dependency jars
 
 ---
     <assembly>
         <inclusions>
             <inclusion>
-                <!-- add jar already prepossessed with different options -->
+                <!-- add jar already preprocessed with different options -->
                 <groupId>org.microemu</groupId><artifactId>microemu-cldc</artifactId><classifier>4applet</classifier><library>true</library>
                 <!-- filter will not apply -->
             </inclusion>
@@ -261,7 +261,7 @@ proguard-maven-plugin
     </build>
 ---
 
-    Use different version of {{{http://proguard.sourceforge.net/}ProGuard}}
+    Use different version of {{{https://www.guardsquare.com/proguard}ProGuard}}
 
 ---
     <build>

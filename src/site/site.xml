@@ -1,6 +1,6 @@
 <project name="Maven proguard Plug-In">
   <body>
-    <menu name="Maven proguard Quickstart">
+    <menu name="Maven ProGuard Quickstart">
         <item name="Introduction" href="index.html"/>
         <item name="Plugin Goals" href="plugin-info.html"/>
     </menu>
