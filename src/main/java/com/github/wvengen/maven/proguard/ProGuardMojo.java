@@ -55,10 +55,7 @@ import org.apache.tools.ant.taskdefs.Java;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 /**
- *
- * <p>
- * The Obfuscate task provides a stand-alone obfuscation task
- * </p>
+ * Runs ProGuard as part of the build.
  *
  * @goal proguard
  * @phase package
