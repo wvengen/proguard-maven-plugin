@@ -16,7 +16,7 @@
 	<groupId>com.github.wvengen</groupId>
 	<artifactId>proguard-maven-plugin</artifactId>
 	<name>ProGuard Maven Plugin</name>
-	<version>2.6.2-SNAPSHOT</version>
+	<version>2.7.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<description>Maven 3 Plugin for ProGuard</description>
