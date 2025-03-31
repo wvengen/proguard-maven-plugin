@@ -9,9 +9,11 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: read #  to fetch code (actions/checkout)
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -22,5 +24,10 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: maven
+
     - name: Build with Maven
-      run: mvn -B verify -P=integration-test
+      run: mvn --batch-mode --no-transfer-progress verify -P=integration-test
+
+    # Always build plugin site (but don't publish), to make sure build works
+    - name: Build plugin site
+      run: mvn --batch-mode --no-transfer-progress site

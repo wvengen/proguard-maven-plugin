@@ -10,11 +10,11 @@ proguard-maven-plugin
 
 * Overview
 
-  The proguard-maven-plugin is a Maven plugin to execute {{{https://www.guardsquare.com/proguard}ProGuard}}
+  The proguard-maven-plugin is a Maven plugin to execute {{{https://www.guardsquare.com/proguard}ProGuard}}.
 
 * Parameters
 
-    Regular {{{proguard-mojo.html}proguard:proguard parameters}}
+    Regular {{{./proguard-mojo.html}proguard:proguard parameters}}
 
     ** <<<libs>>> JVM libraries usually not in dependency list
 
@@ -25,19 +25,19 @@ proguard-maven-plugin
     </libs>
 ---
 
-    ** You can use <<<inFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry Filters}} to input jar
+    ** You can use <<<inFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry filters}} to input jar
 
 ---
     <inFilter>!org/microemu/app/classloader/**</inFilter>
 ---
 
-    ** You can use <<<inLibsFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry Filters}} to all input lib jars
+    ** You can use <<<inLibsFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry filters}} to all input lib jars
 
 ---
     <inLibsFilter>!META-INF/versions/**</inLibsFilter>
 ---
 
-    ** You can use <<<outFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry Filters}} to output jar
+    ** You can use <<<outFilter>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry filters}} to output jar
 
 ---
     <outFilter>!**ECLIPSEF.*</outFilter>
@@ -58,10 +58,10 @@ proguard-maven-plugin
 ---
 
     ** <<<assembly>>> allows to bundle project dependency to resulting jar with different options e.g. -injars ProGuard args.
-    Some flagged as <<<library>>> doesn`t need to be processed by ProGuard are added as -libraryjars and added to resulting jar by plugin after ProGuard is finished.
+    Some flagged as <<<library>>> doesn't need to be processed by ProGuard are added as -libraryjars and added to resulting jar by plugin after ProGuard is finished.
     For clarity param <<<includeDependency>>> will just add -libraryjars arg to ProGuard and Dependency is not included in resulting jar.
 
-    You can use <<<assembly>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry Filters}} to dependency jars
+    You can use <<<assembly>>> to apply ProGuard {{{https://www.guardsquare.com/manual/configuration/usage#filters}classpathentry filters}} to dependency jars:
 
 ---
     <assembly>
@@ -72,7 +72,7 @@ proguard-maven-plugin
                 <!-- filter will not apply -->
             </inclusion>
             <inclusion>
-                <!-- filter out some classes see ProGuard classpathentry Filters -->
+                <!-- filter out some classes see ProGuard classpathentry filters -->
                 <groupId>org.microemu</groupId><artifactId>microemu-javase</artifactId>
                 <filter>!org/microemu/app/classloader/**</filter>
             </inclusion>
@@ -113,23 +113,23 @@ proguard-maven-plugin
 
         * <<<-verbose>>>  When executing <<<maven -X>>>
 
-        * <<<-printmapping>>> is based on the <<<mappingFileName>>> set in the configuration, defaults to '${project.build.directory}/<\<mappingFileName\>>', while <<<-printseeds>>> is based on <<<seedFileName>>> and defaults to '${project.build.directory}/<\<seedFileName\>>'
+        * <<<-printmapping>>> is based on the <<<mappingFileName>>> set in the configuration, defaults to '$\{project.build.directory\}/<\<mappingFileName\>>', while <<<-printseeds>>> is based on <<<seedFileName>>> and defaults to '$\{project.build.directory\}/<\<seedFileName\>>'
 
         []
 
-    Additional ProGuard configuration can be added using {{{proguard-mojo.html#options}options}} or {{{proguard-mojo.html#proguardInclude}proguardInclude}}
+    Additional ProGuard configuration can be added using {{{./proguard-mojo.html#options}options}} or {{{./proguard-mojo.html#proguardInclude}proguardInclude}}
 
 
     ** Command line length workaround
 
-        If you have a huge list of dependencies the list of <<<-libraryjars>>> the resulting command line to execute ProGaurd could become too long. On Windows the error message could look like <<<CreateProcess error=206, The filename or extension is too long>>>.
+        If you have a huge list of dependencies the list of <<<-libraryjars>>> the resulting command line to execute ProGuard could become too long. On Windows the error message could look like <<<CreateProcess error=206, The filename or extension is too long>>>.
 
         * <<< <generateTemporaryConfigurationFile>true</generateTemporaryConfigurationFile> >>> makes the plugin pass the configuration by a temporary file instead of over the command line. Build performance should not be impacted by this.
 
 
 * Usage
 
-    Replace project artifact with obfuscated one. Original jar would be preserved in file project.build.finalName.jar_proguard_base.jar
+    Replace project artifact with obfuscated one. Original jar would be preserved in file '<\<artifact-name\>>_proguard_base.jar'.
 
 ---
     <build>
@@ -157,7 +157,7 @@ proguard-maven-plugin
     </build>
 ---
 
-  Create new file ${project.build.finalName}-small.jar
+  Create new file '$\{project.build.finalName\}-small.jar':
 
 ---
     <build>
@@ -187,7 +187,7 @@ proguard-maven-plugin
     </build>
 ---
 
- Complex Applet creation example. See full {{{http://www.microemu.org/}MicroEmulator}} project sources for more details
+ Complex Applet creation example. See full {{{http://www.microemu.org/}MicroEmulator}} project sources for more details.
 
 ---
 
@@ -261,7 +261,7 @@ proguard-maven-plugin
     </build>
 ---
 
-    Use different version of {{{https://www.guardsquare.com/proguard}ProGuard}}
+    Use different version of {{{https://www.guardsquare.com/proguard}ProGuard}}:
 
 ---
     <build>
