@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -397,6 +398,15 @@ public class ProGuardMojo extends AbstractMojo {
 	private Log log;
 
 	/**
+	 * ProGuard filter which excludes the {@code MANIFEST.MF} file
+	 */
+	private static final String MANIFEST_FILTER = "!META-INF/MANIFEST.MF";
+	/**
+	 * ProGuard filter which excludes the Maven descriptors in the {@code META-INF/maven/} directory
+	 */
+	private static final String MAVEN_DESCRIPTORS_FILTER = "!META-INF/maven/**";
+
+	/**
 	 * ProGuard docs: Names with special characters like spaces and parentheses must be quoted with single or double
 	 * quotes.
 	 */
@@ -408,6 +418,21 @@ public class ProGuardMojo extends AbstractMojo {
 		return fileNameToString(file.toString());
 	}
 
+	/**
+	 * Creates a ProGuard classpath filter string.
+	 */
+	private String createFilterString(List<String> names) {
+		if (names.isEmpty()) {
+			return "";
+		}
+
+		return "(" + String.join(",", names) + ")";
+	}
+
+	private String createFilterString(String... names) {
+		return createFilterString(Arrays.asList(names));
+	}
+
 	private String libFileToStringWithInLibsFilter(File file) {
 		return libFileToStringWithInLibsFilter(file.toString());
 	}
@@ -415,7 +440,7 @@ public class ProGuardMojo extends AbstractMojo {
 	private String libFileToStringWithInLibsFilter(String file) {
 		StringBuilder filter = new StringBuilder(fileNameToString(file));
 		if ((inLibsFilter != null)) {
-			filter.append("(").append(inLibsFilter).append(")");
+			filter.append(createFilterString(inLibsFilter));
 		}
 		return filter.toString();
 	}
@@ -545,17 +570,15 @@ public class ProGuardMojo extends AbstractMojo {
 				StringBuilder filter = new StringBuilder(fileToString(file));
 				List<String> filterList = new ArrayList<>();
 				if (!addManifest) {
-					filterList.add("!META-INF/MANIFEST.MF");
+					filterList.add(MANIFEST_FILTER);
 				}
 				if (!addMavenDescriptor) {
-					filterList.add("!META-INF/maven/**");
+					filterList.add(MAVEN_DESCRIPTORS_FILTER);
 				}
 				if (entry.getValue().filter != null) {
 					filterList.add(entry.getValue().filter);
 				}
-				if (filterList.size() > 0){
-					filter.append("(").append(String.join(",",filterList)).append( ")");
-				}
+				filter.append(createFilterString(filterList));
 				args.add("-injars");
 				args.add(filter.toString());
 			}
@@ -578,27 +601,34 @@ public class ProGuardMojo extends AbstractMojo {
 			args.add("-injars");
 			StringBuilder filter = new StringBuilder(fileToString(inJarFile));
 			if ((inFilter != null) || (!addMavenDescriptor)) {
-				filter.append("(");
-				boolean coma = false;
+				List<String> filterList = new ArrayList<>();
 
 				if (!addMavenDescriptor) {
-					coma = true;
-					filter.append("!META-INF/maven/**");
+					filterList.add(MAVEN_DESCRIPTORS_FILTER);
 				}
 
 				if (inFilter != null) {
-					if (coma) {
-						filter.append(",");
-					}
-					filter.append(inFilter);
+					filterList.add(inFilter);
 				}
 
-				filter.append(")");
+				filter.append(createFilterString(filterList));
 			}
 			args.add(filter.toString());
 		}
 
 		if (includeDependency) {
+			List<String> dependencyInjarFilterList = new ArrayList<>();
+			if (!addManifest) {
+				dependencyInjarFilterList.add(MANIFEST_FILTER);
+			}
+			if (!addMavenDescriptor) {
+				dependencyInjarFilterList.add(MAVEN_DESCRIPTORS_FILTER);
+			}
+			if (inFilter != null) {
+				dependencyInjarFilterList.add(inFilter);
+			}
+			String dependencyInjarFilter = createFilterString(dependencyInjarFilterList);
+
 			@SuppressWarnings("unchecked")
 			List<Artifact> dependency = this.mavenProject.getCompileArtifacts();
 			for (Artifact artifact : dependency) {
@@ -615,7 +645,7 @@ public class ProGuardMojo extends AbstractMojo {
 				if (includeDependencyInjar) {
 					log.debug("--- ADD library as injars:" + artifact.getArtifactId());
 					args.add("-injars");
-					args.add(fileToString(file));
+					args.add(fileToString(file) + dependencyInjarFilter);
 				} else {
 					log.debug("--- ADD libraryjars:" + artifact.getArtifactId());
 					if (putLibraryJarsInTempDir) {
@@ -632,7 +662,7 @@ public class ProGuardMojo extends AbstractMojo {
 			args.add("-outjars");
 			StringBuilder filter = new StringBuilder(fileToString(outJarFile));
 			if (outFilter != null) {
-				filter.append("(").append(outFilter).append(")");
+				filter.append(createFilterString(outFilter));
 			}
 			args.add(filter.toString());
 		}
