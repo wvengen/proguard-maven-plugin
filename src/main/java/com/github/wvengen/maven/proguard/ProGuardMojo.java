@@ -600,19 +600,16 @@ public class ProGuardMojo extends AbstractMojo {
 		if (inJarFile.exists()) {
 			args.add("-injars");
 			StringBuilder filter = new StringBuilder(fileToString(inJarFile));
-			if ((inFilter != null) || (!addMavenDescriptor)) {
-				List<String> filterList = new ArrayList<>();
 
-				if (!addMavenDescriptor) {
-					filterList.add(MAVEN_DESCRIPTORS_FILTER);
-				}
-
-				if (inFilter != null) {
-					filterList.add(inFilter);
-				}
-
-				filter.append(createFilterString(filterList));
+			List<String> filterList = new ArrayList<>();
+			if (!addMavenDescriptor) {
+				filterList.add(MAVEN_DESCRIPTORS_FILTER);
 			}
+			if (inFilter != null) {
+				filterList.add(inFilter);
+			}
+			filter.append(createFilterString(filterList));
+	
 			args.add(filter.toString());
 		}
 
