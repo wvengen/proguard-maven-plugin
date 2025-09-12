@@ -149,6 +149,7 @@ public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * Specifies that project compile dependencies should be added as {@code -injars}.
+	 * Filters for the dependencies can be specified with {@link #inDependenciesFilter}.
 	 *
 	 * @parameter default-value="false"
 	 */
@@ -209,6 +210,14 @@ public class ProGuardMojo extends AbstractMojo {
 	 * @parameter
 	 */
 	protected String inLibsFilter;
+
+	/**
+	 * Apply ProGuard classpathentry filters to all dependency jars when {@link #includeDependencyInjar} is used.
+	 * e.g. {@code !META-INF/**,!META-INF/versions/9/**.class}
+	 *
+	 * @parameter
+	 */
+	protected String inDependenciesFilter;
 
 	/**
 	 * Specifies the names of the output jars. If not set, the input jar is overwritten.
@@ -600,19 +609,16 @@ public class ProGuardMojo extends AbstractMojo {
 		if (inJarFile.exists()) {
 			args.add("-injars");
 			StringBuilder filter = new StringBuilder(fileToString(inJarFile));
-			if ((inFilter != null) || (!addMavenDescriptor)) {
-				List<String> filterList = new ArrayList<>();
 
-				if (!addMavenDescriptor) {
-					filterList.add(MAVEN_DESCRIPTORS_FILTER);
-				}
-
-				if (inFilter != null) {
-					filterList.add(inFilter);
-				}
-
-				filter.append(createFilterString(filterList));
+			List<String> filterList = new ArrayList<>();
+			if (!addMavenDescriptor) {
+				filterList.add(MAVEN_DESCRIPTORS_FILTER);
 			}
+			if (inFilter != null) {
+				filterList.add(inFilter);
+			}
+			filter.append(createFilterString(filterList));
+	
 			args.add(filter.toString());
 		}
 
@@ -624,8 +630,8 @@ public class ProGuardMojo extends AbstractMojo {
 			if (!addMavenDescriptor) {
 				dependencyInjarFilterList.add(MAVEN_DESCRIPTORS_FILTER);
 			}
-			if (inFilter != null) {
-				dependencyInjarFilterList.add(inFilter);
+			if (inDependenciesFilter != null) {
+				dependencyInjarFilterList.add(inDependenciesFilter);
 			}
 			String dependencyInjarFilter = createFilterString(dependencyInjarFilterList);
 
