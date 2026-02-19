@@ -48,87 +48,81 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Java;
+import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 /**
  * Runs ProGuard as part of the build.
- *
- * @goal proguard
- * @phase package
- * @description Create small jar files using ProGuard
- * @requiresDependencyResolution compile
- * @threadSafe
  */
-
+@Mojo(
+	name = "proguard",
+	defaultPhase = LifecyclePhase.PACKAGE,
+	requiresDependencyResolution = ResolutionScope.COMPILE,
+	threadSafe = true
+)
 public class ProGuardMojo extends AbstractMojo {
 
 	/**
 	 * Set this to 'true' to bypass ProGuard processing entirely.
-	 *
-	 * @parameter property="proguard.skip"
 	 */
+	@Parameter(property = "proguard.skip")
 	private boolean skip;
 
 	/**
 	 * Recursively reads configuration options from the given file.
-	 *
-	 * @parameter default-value="${basedir}/proguard.conf"
 	 */
+	@Parameter(defaultValue = "${project.basedir}/proguard.conf")
 	private File proguardInclude;
 
 	/**
 	 * Select specific ProGuard version from plugin dependencies.
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	private String proguardVersion;
 
 	/**
 	 * To run DexGuard instead of ProGuard, set this to 'true'.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean useDexGuard;
 
 	/**
 	 * ProGuard configuration options
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	private String[] options;
 
 	/**
 	 * Specifies whether to obfuscate the input class files.
-	 *
-	 * @parameter default-value="true"
 	 */
+	@Parameter(defaultValue = "true")
 	private boolean obfuscate;
 
 	/**
 	 * Specifies that project compile dependencies be added as {@code -libraryjars} to ProGuard arguments. Dependency itself is
 	 * not included in resulting jar unless you set {@link #includeDependencyInjar} to 'true'.
-	 *
-	 * @parameter default-value="true"
 	 */
+	@Parameter(defaultValue = "true")
 	private boolean includeDependency;
 
-	/**
-	 * @parameter expression="${project.build.directory}/tempLibraryjars"
-	 * @readonly
-	 */
+	@Parameter(readonly = true, defaultValue = "${project.build.directory}/tempLibraryjars")
 	private File tempLibraryjarsDir;
 
 	/**
 	 * Specifies to copy all the {@code -libraryjars} dependencies into a temporary directory and pass that directory
 	 * as the only {@code -libraryjars} argument to ProGuard.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean putLibraryJarsInTempDir;
 
 	/**
@@ -136,44 +130,36 @@ public class ProGuardMojo extends AbstractMojo {
      *
      * <p>If this parameter is 'true', the configuration is passed to the ProGuard process through a file, instead of through
      * command line arguments. This bypasses the operating system restrictions on the length of the command line arguments.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean generateTemporaryConfigurationFile;
 
-	/**
-	 * @parameter expression="${project.build.directory}/generated-proguard.conf"
-	 * @readonly
-	 */
+	@Parameter(readonly = true, defaultValue = "${project.build.directory}/generated-proguard.conf")
 	private File temporaryConfigurationFile;
 
 	/**
 	 * Specifies that project compile dependencies should be added as {@code -injars}.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean includeDependencyInjar;
 
 	/**
 	 * Bundle project dependency to resulting jar. Specifies list of artifact inclusions.
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	private Assembly assembly;
 
 	/**
 	 * Additional {@code -libraryjars} e.g. <code>${java.home}/lib/rt.jar</code>. Project compile dependency are added automatically,
 	 * see {@link #exclusions}.
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	private List<String> libs;
 
 	/**
 	 * List of dependency exclusions
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	private List<Exclusion> exclusions;
 
 	/**
@@ -183,216 +169,179 @@ public class ProGuardMojo extends AbstractMojo {
 	 * <p>You may specify a classes directory e.g. 'classes'. This way the plugin will process
 	 * the classes instead of the jar. You would need to bind the execution to phase 'compile'
 	 * or 'process-classes' in this case.
-	 *
-	 * @parameter expression="${project.build.finalName}.jar"
-	 * @required
 	 */
+	@Parameter(required = true, defaultValue = "${project.build.finalName}.jar")
 	protected String injar;
 
 	/**
 	 * Set this to 'true' to bypass ProGuard processing when injar does not exists.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean injarNotExistsSkip;
 
 	/**
 	 * Apply ProGuard classpathentry filters to input jar. e.g. <code>!**.gif,!**&#47;tests/**</code>
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	protected String inFilter;
 
 	/**
 	 * Apply ProGuard classpathentry filters to all input lib jars. e.g. {@code !META-INF/**,!META-INF/versions/9/**.class}
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	protected String inLibsFilter;
 
 	/**
 	 * Specifies the names of the output jars. If not set, the input jar is overwritten.
 	 *
 	 * <p>If {@link #attach} is 'true' the value is ignored and the name is constructed based on classifier.
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	protected String outjar;
 
 	/**
 	 * Apply ProGuard classpathentry filters to output jar. e.g. <code>!**.gif,!**&#47;tests/**</code>
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	protected String outFilter;
 
 	/**
 	 * Specifies whether to attach the created artifact to the project.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean attach;
 
 	/**
 	 * Determines if {@link #attach} also attaches the {@link #mappingFileName} file.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean attachMap;
 
 	/**
 	 * Determines if {@link #attach} also attaches the {@link #seedFileName} file.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean attachSeed;
 
 	/**
 	 * Specifies attach artifact type.
-	 *
-	 * @parameter default-value="jar"
 	 */
+	@Parameter(defaultValue = "jar")
 	private String attachArtifactType;
 
 	/**
 	 * Specifies attach artifact Classifier, ignored if {@link #attach} is 'false'.
-	 *
-	 * @parameter default-value="small"
 	 */
+	@Parameter(defaultValue = "small")
 	private String attachArtifactClassifier;
 
 	/**
 	 * Whether to append the {@link #attachArtifactClassifier} to the artifact final name.
-	 *
-	 * @parameter default-value="true"
 	 */
+	@Parameter(defaultValue = "true")
 	private boolean appendClassifier;
 
 	/**
 	 * Whether to include {@code META-INF/MANIFEST.MF} file
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean addManifest;
 
 	/**
 	 * Whether to include {@code META-INF/maven/**} Maven descriptor.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean addMavenDescriptor;
 
 	/**
 	 * Directory containing the input and generated JAR.
-	 *
-	 * @parameter property="project.build.directory"
-	 * @required
 	 */
+	@Parameter(required = true, defaultValue = "${project.build.directory}")
 	protected File outputDirectory;
 
 	/**
 	 * The Maven project reference where the plugin is currently being executed. The default value is populated from
 	 * Maven.
-	 *
-	 * @parameter property="project"
-	 * @readonly
-	 * @required
 	 */
+	@Parameter(readonly = true, required = true, defaultValue = "${project}")
 	protected MavenProject mavenProject;
 
 	/**
 	 * The plugin dependencies.
-	 *
-	 * @parameter property="plugin.artifacts"
-	 * @required
-	 * @readonly
 	 */
+	@Parameter(readonly = true, required = true, defaultValue = "${plugin.artifacts}")
 	protected List<Artifact> pluginArtifacts;
 
-	/**
-	 * @component
-	 */
+	@Component
 	private MavenProjectHelper projectHelper;
 
 	/**
 	 * The Jar archiver.
-	 *
-	 * @component role="org.codehaus.plexus.archiver.Archiver" roleHint="jar"
-	 * @required
 	 */
+	@Component(role = Archiver.class, hint = "jar")
 	private JarArchiver jarArchiver;
 
 	/**
 	 * The Maven archive configuration to use. Only if {@link #assembly} is used.
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	protected MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
 	/**
 	 * The max memory the forked Java process should use, e.g. 256m
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	protected String maxMemory;
 
 	/**
 	 * ProGuard main class name.
-	 *
-	 * @parameter default-value="proguard.ProGuard"
 	 */
-	protected String proguardMainClass = "proguard.ProGuard";
+	@Parameter(defaultValue = "proguard.ProGuard")
+	protected String proguardMainClass;
 
 	/**
 	 * Sets the name of the ProGuard mapping file.
-	 *
-	 * @parameter default-value="proguard_map.txt"
 	 */
-	protected String mappingFileName = "proguard_map.txt";
+	@Parameter(defaultValue = "proguard_map.txt")
+	protected String mappingFileName;
 
 	/**
 	 * Sets the name of the ProGuard seed file.
-	 *
-	 * @parameter default-value="proguard_seed.txt"
 	 */
-	protected String seedFileName = "proguard_seeds.txt";
+	@Parameter(defaultValue = "proguard_seed.txt")
+	protected String seedFileName;
 
 	/**
 	 * Sets the name of the ProGuard {@code -applymapping} file.
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	protected File applyMappingFile;
 
 	/**
 	 * Specifies whether to enable <a href=
 	 * "https://www.guardsquare.com/en/proguard/manual/examples#incremental">
 	 * incremental obfuscation</a>
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean incremental;
 
 	/**
 	 * The ProGuard jar to use. Useful for using beta versions of
 	 * ProGuard that aren't yet on Maven Central.
-	 *
-	 * @parameter
 	 */
+	@Parameter
 	protected File proguardJar;
 
 	/**
 	 * If the plugin should be silent.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean silent;
 
 	/**
 	 * Bind ProGuard output to Maven plugin logging.
-	 *
-	 * @parameter default-value="false"
 	 */
+	@Parameter(defaultValue = "false")
 	private boolean bindToMavenLogging;
 
 	private Log log;
@@ -698,8 +647,8 @@ public class ProGuardMojo extends AbstractMojo {
 			if (tempLibraryjarsDir.exists()) {
 				try {
 					FileUtils.deleteDirectory(tempLibraryjarsDir);
-				} catch (IOException ignored) {
-					throw new MojoFailureException("Deleting failed libraryJars directory", ignored);
+				} catch (IOException e) {
+					throw new MojoFailureException("Deleting failed libraryJars directory", e);
 				}
 			}
 			tempLibraryjarsDir.mkdir();
