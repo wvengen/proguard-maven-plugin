@@ -124,7 +124,13 @@
 			<version>3.9.12</version>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.maven.plugin-tools</groupId>
+			<artifactId>maven-plugin-annotations</artifactId>
+			<version>3.15.1</version>
+			<!-- Only needed at build time -->
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -281,7 +287,7 @@
 						<configuration>
 							<projectsDirectory>${project.basedir}/src/it</projectsDirectory>
 							<cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-							<localRepositoryPath>${projects.build.directory}/local-repo</localRepositoryPath>
+							<localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
 							<!-- the .groovy extension (or .bsh, if you're using BeanShell) is implied -->
 							<postBuildHookScript>verify</postBuildHookScript>
 							<goals>
